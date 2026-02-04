@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -82,6 +82,9 @@ private final SendableChooser<Command> autoChooser;
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     autoChooser = AutoBuilder.buildAutoChooser();
+
+    //Put the autoChooser on the SmartDashboard
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   /**
@@ -164,8 +167,8 @@ private final SendableChooser<Command> autoChooser;
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("test1");
-    //return autoChooser.getSelected();
+    //return drivebase.getAutonomousCommand("test1");
+    return autoChooser.getSelected();
   }
 
   public void setMotorBrake(boolean brake)
