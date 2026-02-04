@@ -12,7 +12,14 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
@@ -33,6 +40,7 @@ public class Robot extends TimedRobot
 
   private static Robot   instance;
   private        Command m_autonomousCommand;
+ TalonFX PrototypeMotor = new TalonFX(3); //Id is probably wrong
 
   private RobotContainer m_robotContainer;
   XboxController driveController = new XboxController(0);
@@ -54,11 +62,11 @@ public class Robot extends TimedRobot
    */
   @Override
   public void robotInit() {  
-    UsbCamera camera0 = CameraServer.startAutomaticCapture(0);
-    UsbCamera camera1 = CameraServer.startAutomaticCapture(1);
+    // UsbCamera camera0 = CameraServer.startAutomaticCapture(0);
+    // UsbCamera camera1 = CameraServer.startAutomaticCapture(1);
     
-    CameraServer.addCamera(camera0);
-    CameraServer.addCamera(camera1);
+    // CameraServer.addCamera(camera0);
+    // CameraServer.addCamera(camera1);
   
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
@@ -151,6 +159,30 @@ public class Robot extends TimedRobot
     {
       CommandScheduler.getInstance().cancelAll();
     }
+     TalonFXConfiguration toConfigure = new TalonFXConfiguration();
+    CurrentLimitsConfigs m_currentLimits = new CurrentLimitsConfigs();
+
+    m_currentLimits.SupplyCurrentLimit = 40; // Limit to 1 amps
+    m_currentLimits.SupplyCurrentLimitEnable = true; // And enable it
+    m_currentLimits.StatorCurrentLimit = 40; // Limit stator to 20 amps
+    m_currentLimits.StatorCurrentLimitEnable = true; // And enable it
+
+    toConfigure.CurrentLimits = m_currentLimits;
+
+    PrototypeMotor.getConfigurator().apply(toConfigure);
+    PrototypeMotor.setNeutralMode(NeutralModeValue.Brake);
+
+    // in init function, set slot 0 gains
+    var slot0Configs = new Slot0Configs();
+    slot0Configs.kS = 0.05; // Add 0.05 V output to overcome static friction
+    slot0Configs.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
+    slot0Configs.kP = 0.11; // An error of 1 rps results in 0.11 V output
+    slot0Configs.kI = 0.5; // An error of 1 rps increases output by 0.5 V each second
+    slot0Configs.kD = 0.01; // An acceleration of 1 rps/s results in 0.01 V output
+
+    
+
+    PrototypeMotor.getConfigurator().apply(slot0Configs);
   }
 
   /**
@@ -159,13 +191,27 @@ public class Robot extends TimedRobot
   @Override
   public void teleopPeriodic()
   {
-   // System.out.println(stringPot.get());
+  //  System.out.println(roboGyro.getYaw().getValueAsDouble());
 
-    if (driveController.getYButtonPressed()){
-      System.out.println(roboGyro.getYaw());
-      roboGyro.reset();
-      System.out.println(roboGyro.getYaw());
+    // if (driveController.getYButtonPressed()){
+    // System.out.println("RESET");
+    //   roboGyro.reset();
+    
+    // }
+
+    int prototypetargetRPS = 0;
+
+    if (driveController.getRightTriggerAxis() > 0.2){
+      prototypetargetRPS = 64;
+    } else {
+      prototypetargetRPS = 0;
     }
+     
+    // create a velocity closed-loop request, voltage output, slot 0 configs
+    var request = new VelocityVoltage(0).withSlot(0);
+
+    // set velocity to target rps, add 0.5 V to overcome gravity
+    PrototypeMotor.setControl(request.withVelocity(prototypetargetRPS).withFeedForward(0.5));
   }
 
   @Override

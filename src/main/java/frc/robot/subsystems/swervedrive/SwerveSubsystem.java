@@ -561,6 +561,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public void zeroGyro()
   {
+    System.out.println("ZeroReset");
     swerveDrive.zeroGyro();
   }
 
