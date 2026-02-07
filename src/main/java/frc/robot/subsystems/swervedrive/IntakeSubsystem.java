@@ -19,7 +19,7 @@ public class IntakeSubsystem extends SubsystemBase{
     PIDController intakePID;
     SparkMax intakeMoverMax;
     
-    boolean intakeOut;
+    boolean isIntakeOut;
     double target;
 
     XboxController driveController = new XboxController(0);
@@ -30,7 +30,7 @@ public class IntakeSubsystem extends SubsystemBase{
         intakePID = new PIDController(.5, 0, 0);
         intakeMoverMax = new SparkMax(33, MotorType.kBrushless);
         
-        intakeOut = false;
+        isIntakeOut = false;
         
         driveController = new XboxController(0);
 
@@ -50,18 +50,30 @@ public class IntakeSubsystem extends SubsystemBase{
 
     public Command Moveintake(){
         return run(()-> {
-            if (intakeOut){
+
+            intakeMoverMax.set(intakePID.calculate(intakeMoverMax.getAbsoluteEncoder().getPosition(),target)*.2);
+            });}
+
+    public Command Swap(){
+        return run(()->{
+
+            if (intakePID.atSetpoint() && target == 90) {
+                isIntakeOut = true;
+            } else if (intakePID.atSetpoint() && target == 0) {
+                isIntakeOut = false;
+            }
+            
+            if (isIntakeOut){
                 target = 0;
             }
-            if (!intakeOut) {
+            if (!isIntakeOut) {
                 target = 90;
             }
 
-            intakeMoverMax.set(intakePID.calculate(intakeMoverMax.getAbsoluteEncoder().getPosition(),target)*.2);
 
-            if (!driveController.getAButton() && intakePID.atSetpoint()) {
-                intakeOut = !intakeOut; 
-            }
         });
     }
+            
+        
+    
 }
