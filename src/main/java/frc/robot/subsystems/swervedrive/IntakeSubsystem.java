@@ -44,7 +44,6 @@ public class IntakeSubsystem extends SubsystemBase{
     public Command intakeOut(){
         return run(()->{
             intakeMax.set(-.20);
-            
         });
     } 
 
@@ -62,7 +61,7 @@ public class IntakeSubsystem extends SubsystemBase{
             } else if (intakePID.atSetpoint() && target == 0) {
                 isIntakeOut = false;
             }
-            
+
             if (isIntakeOut){
                 target = 0;
             }
