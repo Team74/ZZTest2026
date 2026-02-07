@@ -62,11 +62,13 @@ public class Robot extends TimedRobot
    */
   @Override
   public void robotInit() {  
-    // UsbCamera camera0 = CameraServer.startAutomaticCapture(0);
-    // UsbCamera camera1 = CameraServer.startAutomaticCapture(1);
-    
-    // CameraServer.addCamera(camera0);
-    // CameraServer.addCamera(camera1);
+    UsbCamera camera0 = CameraServer.startAutomaticCapture(0);
+    UsbCamera camera1 = CameraServer.startAutomaticCapture(1);
+    UsbCamera camera2 = CameraServer.startAutomaticCapture(2);
+
+    CameraServer.addCamera(camera0);
+    CameraServer.addCamera(camera1);
+    CameraServer.addCamera(camera2);
   
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.

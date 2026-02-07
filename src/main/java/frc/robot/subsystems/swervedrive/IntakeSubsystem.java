@@ -21,17 +21,19 @@ public class IntakeSubsystem extends SubsystemBase{
     
     boolean isIntakeOut;
     double target;
-
+    double lim;
     XboxController driveController = new XboxController(0);
 
     public IntakeSubsystem(){
         intakeMax = new SparkMax(12, MotorType.kBrushless);
         
-        intakePID = new PIDController(.5, 0, 0);
+        intakePID = new PIDController(.05, 0, 0);
+        intakePID.setTolerance(5);
         intakeMoverMax = new SparkMax(33, MotorType.kBrushless);
-        
+        intakeMoverMax.getEncoder().setPosition(81);
         isIntakeOut = false;
         
+        lim = intakeMoverMax.configAccessor.getSmartCurrentLimit();
         driveController = new XboxController(0);
 
     }
@@ -48,26 +50,33 @@ public class IntakeSubsystem extends SubsystemBase{
         });
     } 
 
+        public Command intakeStop(){
+        return run(()->{
+            intakeMax.set(0);
+            
+        });
+    } 
+
     public Command Moveintake(){
         return run(()-> {
-
-            intakeMoverMax.set(intakePID.calculate(intakeMoverMax.getAbsoluteEncoder().getPosition(),target)*.2);
+System.out.println("Current: " + intakeMoverMax.getOutputCurrent() +" Current Lim: " + lim);
+            intakeMoverMax.set(intakePID.calculate(intakeMoverMax.getEncoder().getPosition(),target)*.2);
             });}
 
     public Command Swap(){
         return run(()->{
 
-            if (intakePID.atSetpoint() && target == 90) {
+            if (intakePID.atSetpoint() && target == 55) {
                 isIntakeOut = true;
-            } else if (intakePID.atSetpoint() && target == 0) {
+            } else if (intakePID.atSetpoint() && target == 81) {
                 isIntakeOut = false;
             }
             
             if (isIntakeOut){
-                target = 0;
+                target = 81;
             }
             if (!isIntakeOut) {
-                target = 90;
+                target = 55;
             }
 
 

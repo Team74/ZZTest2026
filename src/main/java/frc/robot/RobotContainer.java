@@ -119,6 +119,8 @@ private final SendableChooser<Command> autoChooser;
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
+    IntakeSubsystem();
+
     if (Robot.isSimulation())
     {
       Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
@@ -189,5 +191,6 @@ driverXbox.leftBumper().onTrue(intake.intakeOut());
 
 driverXbox.rightBumper().onTrue(intake.intakeIn());
 
+driverXbox.rightBumper().or(driverXbox.leftBumper()).whileFalse(intake.intakeStop());
   }
 }
