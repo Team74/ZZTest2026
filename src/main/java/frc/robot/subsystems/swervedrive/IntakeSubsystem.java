@@ -1,7 +1,11 @@
 package frc.robot.subsystems.swervedrive;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
@@ -18,7 +22,7 @@ public class IntakeSubsystem extends SubsystemBase{
     
     PIDController intakePID;
     SparkMax intakeMoverMax;
-    
+    SparkMaxConfig thing;
     boolean isIntakeOut;
     double target;
     double lim;
@@ -32,7 +36,8 @@ public class IntakeSubsystem extends SubsystemBase{
         intakeMoverMax = new SparkMax(33, MotorType.kBrushless);
         intakeMoverMax.getEncoder().setPosition(81);
         isIntakeOut = false;
-        
+    thing.smartCurrentLimit(80);
+    intakeMoverMax.configure(thing, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         lim = intakeMoverMax.configAccessor.getSmartCurrentLimit();
         driveController = new XboxController(0);
 
