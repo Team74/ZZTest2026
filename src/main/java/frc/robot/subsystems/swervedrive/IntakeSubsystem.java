@@ -46,7 +46,6 @@ public class IntakeSubsystem extends SubsystemBase{
     public Command intakeOut(){
         return run(()->{
             intakeMax.set(-.20);
-            
         });
     } 
 
@@ -71,7 +70,7 @@ System.out.println("Current: " + intakeMoverMax.getOutputCurrent() +" Current Li
             } else if (intakePID.atSetpoint() && target == 81) {
                 isIntakeOut = false;
             }
-            
+
             if (isIntakeOut){
                 target = 81;
             }
