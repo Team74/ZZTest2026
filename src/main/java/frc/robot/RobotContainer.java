@@ -24,6 +24,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+import frc.robot.subsystems.swervedrive.IntakeSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -33,6 +34,10 @@ import swervelib.SwerveInputStream;
 public class RobotContainer
 {
 
+  
+
+  IntakeSubsystem intake = new IntakeSubsystem();
+  
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
@@ -114,6 +119,8 @@ private final SendableChooser<Command> autoChooser;
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
+    IntakeSubsystem();
+
     if (Robot.isSimulation())
     {
       Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
@@ -174,5 +181,16 @@ private final SendableChooser<Command> autoChooser;
   public void setMotorBrake(boolean brake)
   {
     drivebase.setMotorBrake(brake);
+  }
+
+
+  void IntakeSubsystem() {
+driverXbox.a().onTrue(intake.Swap()).whileFalse(intake.Moveintake());
+
+driverXbox.leftBumper().onTrue(intake.intakeOut());
+
+driverXbox.rightBumper().onTrue(intake.intakeIn());
+
+driverXbox.rightBumper().or(driverXbox.leftBumper()).whileFalse(intake.intakeStop());
   }
 }
