@@ -26,6 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -34,6 +35,9 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
+import limelight.Limelight;
+import limelight.networktables.LimelightResults;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -138,12 +142,23 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+    Limelight limelight = new Limelight("limelight-bot");
+
+    Optional<LimelightResults> results = limelight.getLatestResults();
+
     // When vision is enabled we must manually update odometry in SwerveDrive
-    if (visionDriveTest)
+    /*if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
-    }
+    }*/
+
+    LimelightResults result = results.get();
+
+    Pose2d usefulPose = result.getBotPose2d(Alliance.Blue);
+
+   swerveDrive.addVisionMeasurement(usefulPose, result.timestamp_RIOFPGA_capture);
+
   }
 
   @Override
