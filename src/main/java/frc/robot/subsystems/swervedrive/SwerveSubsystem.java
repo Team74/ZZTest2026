@@ -49,6 +49,9 @@ import limelight.networktables.LimelightResults;
 import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
 import limelight.networktables.LimelightPoseEstimator.EstimationMode;
+import limelight.networktables.LimelightPoseEstimator;
+import org.photonvision.PhotonPoseEstimator;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -177,7 +180,7 @@ public class SwerveSubsystem extends SubsystemBase
     Optional<LimelightResults> results = limelight.getLatestResults();
 
     // When vision is enabled we must manually update odometry in SwerveDrive
-    /*if (visionDriveTest)
+    if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
       // vision.updatePoseEstimation(swerveDrive);
@@ -199,7 +202,9 @@ public class SwerveSubsystem extends SubsystemBase
 
     Optional<PoseEstimate>     poseEstimates = limelightPoseEstimator.getPoseEstimate();
     Optional<LimelightResults> results       = limelight.getLatestResults();
-    if (results.isPresent()/* && poseEstimates.isPresent()*/)
+    if (results.isPresent() && poseEstimates.isPresent())
+    
+
     {
       LimelightResults result       = results.get();
       PoseEstimate     poseEstimate = poseEstimates.get();
