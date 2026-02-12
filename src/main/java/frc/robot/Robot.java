@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -47,6 +49,9 @@ public class Robot extends TimedRobot
   Pigeon2 roboGyro = new Pigeon2(2);
   private Timer disabledTimer;
   AnalogPotentiometer stringPot = new AnalogPotentiometer(0);
+
+  Field2d m_field = new Field2d();
+
   public Robot()
   {
     instance = this;
@@ -69,6 +74,14 @@ public class Robot extends TimedRobot
     CameraServer.addCamera(camera0);
     CameraServer.addCamera(camera1);
     CameraServer.addCamera(camera2);
+
+    // // Call once in robotInit()
+    // LimelightHelpers.setupPortForwardingUSB(0);  // First camera
+    // LimelightHelpers.setupPortForwardingUSB(1);  // Second camera (if applicable)
+
+    // // Access via:
+    // // USB Index 0: http://(robotIP):5801 (UI), http://(robotIP):5800 (stream)
+    // // USB Index 1: http://(robotIP):5811 (UI), http://(robotIP):5810 (stream)
   
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
@@ -82,6 +95,10 @@ public class Robot extends TimedRobot
     {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
+
+    //https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/field2d-widget.html
+    m_field = new Field2d();
+    SmartDashboard.putData(m_field);
   }
 
   /**
