@@ -39,13 +39,11 @@ public class Turret_Shoot {
 
         if (driveController.getRightTriggerAxis()> 0 && testinput2026.get()){
 
-           //TalonFX.limitSensorBottom.get() && AngularVelocityUnit.RPM > 40 && RPM < 30){
-        //System.out.println("reach MAX speed");
-
-        //RPM = 0;
-        //}
+          //if (testinput2026.get() && AngularVelocityUnit.RPM > 40 && RPM < 30){
+            Shoot_Motor.getVelocity();
+        System.out.println("reach MAX speed");
+        }
         
     }
 
-}
 }
