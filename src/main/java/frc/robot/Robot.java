@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -79,6 +81,9 @@ public class Robot extends TimedRobot
 
   Limelight limelight3 = new Limelight("limelight3");
 
+
+  Field2d m_field = new Field2d();
+
   public Robot()
   {
     instance = this;
@@ -94,11 +99,21 @@ public class Robot extends TimedRobot
    */
   @Override
   public void robotInit() {  
-    // UsbCamera camera0 = CameraServer.startAutomaticCapture(0);
-    // UsbCamera camera1 = CameraServer.startAutomaticCapture(1);
-    
-    // CameraServer.addCamera(camera0);
-    // CameraServer.addCamera(camera1);
+    UsbCamera camera0 = CameraServer.startAutomaticCapture(0);
+    UsbCamera camera1 = CameraServer.startAutomaticCapture(1);
+    UsbCamera camera2 = CameraServer.startAutomaticCapture(2);
+
+    CameraServer.addCamera(camera0);
+    CameraServer.addCamera(camera1);
+    CameraServer.addCamera(camera2);
+
+    // // Call once in robotInit()
+    // LimelightHelpers.setupPortForwardingUSB(0);  // First camera
+    // LimelightHelpers.setupPortForwardingUSB(1);  // Second camera (if applicable)
+
+    // // Access via:
+    // // USB Index 0: http://(robotIP):5801 (UI), http://(robotIP):5800 (stream)
+    // // USB Index 1: http://(robotIP):5811 (UI), http://(robotIP):5810 (stream)
   
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
@@ -119,6 +134,10 @@ public class Robot extends TimedRobot
            .withLimelightLEDMode(LEDMode.PipelineControl)
            .withCameraOffset(Pose3d.kZero)
            .save();
+
+    //https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/field2d-widget.html
+    m_field = new Field2d();
+    SmartDashboard.putData(m_field);
   }
 
   /**

@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.swervedrive;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -17,9 +18,13 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -27,7 +32,9 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,11 +43,17 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import limelight.Limelight;
+import limelight.networktables.AngularVelocity3d;
+import limelight.networktables.LimelightPoseEstimator;
 import limelight.networktables.LimelightResults;
+import limelight.networktables.Orientation3d;
+import limelight.networktables.PoseEstimate;
+import limelight.networktables.LimelightPoseEstimator.EstimationMode;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -67,12 +80,14 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean     visionDriveTest = false;
+  private final boolean     visionDriveTest = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
   private       Vision      vision;
 
+  Limelight               limelight;  
+    LimelightPoseEstimator  limelightPoseEstimator;
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -98,7 +113,7 @@ public class SwerveSubsystem extends SubsystemBase
     {
       throw new RuntimeException(e);
     }
-    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
+    swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
                                                true,
@@ -114,7 +129,22 @@ public class SwerveSubsystem extends SubsystemBase
     }
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+
+    setupLimelight();
   }
+
+  public void setupLimelight(){
+      swerveDrive.stopOdometryThread();
+      limelight.getSettings()
+               .withPipelineIndex(0)
+               .withCameraOffset(new Pose3d(Units.inchesToMeters(12),
+                                            Units.inchesToMeters(12),
+                                            Units.inchesToMeters(10.5),
+                                            new Rotation3d(0, 0, Units.degreesToRadians(45))))
+               .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
+               .save();
+      limelightPoseEstimator = limelight.createPoseEstimator(EstimationMode.MEGATAG2);
+    }
 
   /**
    * Construct the swerve drive.
@@ -150,15 +180,63 @@ public class SwerveSubsystem extends SubsystemBase
     /*if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
-    }*/
+      // vision.updatePoseEstimation(swerveDrive);
+      UpdatePoseEstimation_LL();
+    }
+  }
 
-    LimelightResults result = results.get();
+  private int     outofAreaReading = 0;
+  private boolean initialReading = false;
 
-    Pose2d usefulPose = result.getBotPose2d(Alliance.Blue);
+  public void UpdatePoseEstimation_LL() {
+    limelight.getSettings()
+      .withRobotOrientation(new Orientation3d(new Rotation3d(swerveDrive.getOdometryHeading()
+      .rotateBy(Rotation2d.kZero)),
+      new AngularVelocity3d(DegreesPerSecond.of(0),
+        DegreesPerSecond.of(0),
+        DegreesPerSecond.of(0))))
+      .save();
 
-   swerveDrive.addVisionMeasurement(usefulPose, result.timestamp_RIOFPGA_capture);
-
+    Optional<PoseEstimate>     poseEstimates = limelightPoseEstimator.getPoseEstimate();
+    Optional<LimelightResults> results       = limelight.getLatestResults();
+    if (results.isPresent()/* && poseEstimates.isPresent()*/)
+    {
+      LimelightResults result       = results.get();
+      PoseEstimate     poseEstimate = poseEstimates.get();
+      SmartDashboard.putNumber("Avg Tag Ambiguity", poseEstimate.getAvgTagAmbiguity());
+      SmartDashboard.putNumber("Min Tag Ambiguity", poseEstimate.getMinTagAmbiguity());
+      SmartDashboard.putNumber("Max Tag Ambiguity", poseEstimate.getMaxTagAmbiguity());
+      SmartDashboard.putNumber("Avg Distance", poseEstimate.avgTagDist);
+      SmartDashboard.putNumber("Avg Tag Area", poseEstimate.avgTagArea);
+      SmartDashboard.putNumber("Odom Pose/x", swerveDrive.getPose().getX());
+      SmartDashboard.putNumber("Odom Pose/y", swerveDrive.getPose().getY());
+      SmartDashboard.putNumber("Odom Pose/degrees", swerveDrive.getPose().getRotation().getDegrees());
+      SmartDashboard.putNumber("Limelight Pose/x", poseEstimate.pose.getX());
+      SmartDashboard.putNumber("Limelight Pose/y", poseEstimate.pose.getY());
+      SmartDashboard.putNumber("Limelight Pose/degrees", poseEstimate.pose.toPose2d().getRotation().getDegrees());
+      if (result.valid)
+      {
+        // Pose2d estimatorPose = poseEstimate.pose.toPose2d();
+        Pose2d usefulPose     = result.getBotPose2d(Alliance.Blue);
+        double distanceToPose = usefulPose.getTranslation().getDistance(swerveDrive.getPose().getTranslation());
+        if (distanceToPose < 0.5 || (outofAreaReading > 10) || (outofAreaReading > 10 && !initialReading))
+        {
+          if (!initialReading)
+          {
+            initialReading = true;
+          }
+          outofAreaReading = 0;
+          // System.out.println(usefulPose.toString());
+          swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.05, 0.05, 0.022));
+          // System.out.println(result.timestamp_LIMELIGHT_publish);
+          // System.out.println(result.timestamp_RIOFPGA_capture);
+          swerveDrive.addVisionMeasurement(usefulPose, result.timestamp_RIOFPGA_capture);
+        } else
+        {
+          outofAreaReading += 1;
+        }
+      }
+    }
   }
 
   @Override
@@ -732,10 +810,10 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Add a fake vision reading for testing purposes.
    */
-  public void addFakeVisionReading()
-  {
-    swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
-  }
+  // public void addFakeVisionReading()
+  // {
+  //   swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
+  // }
 
   /**
    * Gets the swerve drive object.
