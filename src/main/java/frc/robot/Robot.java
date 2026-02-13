@@ -99,13 +99,13 @@ public class Robot extends TimedRobot
    */
   @Override
   public void robotInit() {  
-    UsbCamera camera0 = CameraServer.startAutomaticCapture(0);
-    UsbCamera camera1 = CameraServer.startAutomaticCapture(1);
-    UsbCamera camera2 = CameraServer.startAutomaticCapture(2);
+    // UsbCamera camera0 = CameraServer.startAutomaticCapture(0);
+    // UsbCamera camera1 = CameraServer.startAutomaticCapture(1);
+    // UsbCamera camera2 = CameraServer.startAutomaticCapture(2);
 
-    CameraServer.addCamera(camera0);
-    CameraServer.addCamera(camera1);
-    CameraServer.addCamera(camera2);
+    // CameraServer.addCamera(camera0);
+    // CameraServer.addCamera(camera1);
+    // CameraServer.addCamera(camera2);
 
     // // Call once in robotInit()
     // LimelightHelpers.setupPortForwardingUSB(0);  // First camera
@@ -267,7 +267,7 @@ public class Robot extends TimedRobot
      
     // create a velocity closed-loop request, voltage output, slot 0 configs
     var request = new VelocityVoltage(0).withSlot(0);
-
+// System.out.println(prototypetargetRPS);
     // set velocity to target rps, add 0.5 V to overcome gravity
     PrototypeMotor.setControl(request.withVelocity(prototypetargetRPS).withFeedForward(0.5));
 

@@ -83,7 +83,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean     visionDriveTest = true;
+  private final boolean     visionDriveTest = false;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -133,7 +133,7 @@ public class SwerveSubsystem extends SubsystemBase
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
 
-    setupLimelight();
+   // setupLimelight();
   }
 
   public void setupLimelight(){
@@ -178,9 +178,9 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
-    Limelight limelight = new Limelight("limelight-bot");
+    // Limelight limelight = new Limelight("limelight-bot");
 
-    Optional<LimelightResults> results = limelight.getLatestResults();
+    // Optional<LimelightResults> results = limelight.getLatestResults();
 
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
