@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -13,6 +14,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+
+import java.io.File;
+import java.util.Optional;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -23,13 +29,30 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import limelight.networktables.AngularVelocity3d;
+import limelight.networktables.LimelightResults;
+import limelight.networktables.LimelightPoseEstimator.EstimationMode;
+import limelight.networktables.LimelightSettings.LEDMode;
+import limelight.networktables.Orientation3d;
+import limelight.networktables.PoseEstimate;
+import limelight.networktables.target.pipeline.NeuralClassifier;
+import swervelib.SwerveDrive;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.Publisher;
+import limelight.Limelight;
+import limelight.networktables.AngularVelocity3d;
+import limelight.networktables.LimelightPoseEstimator;
+import limelight.networktables.LimelightResults;
+import limelight.networktables.Orientation3d;
+import limelight.networktables.PoseEstimate;
+import limelight.networktables.LimelightPoseEstimator.EstimationMode;
+
 
 
 /**
@@ -40,6 +63,12 @@ import edu.wpi.first.networktables.Publisher;
 public class Robot extends TimedRobot
 {
 
+   File directory = new File(Filesystem.getDeployDirectory(),"swerve");
+   static SwerveDrive             swerveDrive;
+    Limelight               limelight;  
+    LimelightPoseEstimator  limelightPoseEstimator;
+    
+
   private static Robot   instance;
   private        Command m_autonomousCommand;
  TalonFX PrototypeMotor = new TalonFX(3); //Id is probably wrong
@@ -49,6 +78,9 @@ public class Robot extends TimedRobot
   Pigeon2 roboGyro = new Pigeon2(2);
   private Timer disabledTimer;
   AnalogPotentiometer stringPot = new AnalogPotentiometer(0);
+
+  Limelight limelight3 = new Limelight("limelight3");
+
 
   Field2d m_field = new Field2d();
 
@@ -95,6 +127,13 @@ public class Robot extends TimedRobot
     {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
+
+    //THIS CODE IS FOR YALL I HAVE NO IDEA IF IT WILL WORK
+    // Set the limelight to use Pipeline LED control, with the Camera offset of 0, and save.
+    limelight3.getSettings()
+           .withLimelightLEDMode(LEDMode.PipelineControl)
+           .withCameraOffset(Pose3d.kZero)
+           .save();
 
     //https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/field2d-widget.html
     m_field = new Field2d();
@@ -231,6 +270,47 @@ public class Robot extends TimedRobot
 
     // set velocity to target rps, add 0.5 V to overcome gravity
     PrototypeMotor.setControl(request.withVelocity(prototypetargetRPS).withFeedForward(0.5));
+
+/*  Get target data
+limelight3.getLatestResults().ifPresent((LimelightResults result) -> {
+    for (NeuralClassifier object : result.targets_Classifier)
+    {
+        // Classifier says its a algae.
+        if (object.className.equals("algae"))
+        {
+            // Check pixel location of algae.
+            if (object.ty > 2 && object.ty < 1)
+            {
+              // Algae is valid! do stuff!
+            }
+        }
+    }
+});
+
+
+ Required for megatag2 in periodic() function before fetching pose.
+limelight3.getSettings()
+		 .withRobotOrientation(new Orientation3d(roboGyro.getRotation3d(),
+												 new AngularVelocity3d(DegreesPerSecond.of(roboGyro.getPitchVelocity()),
+																	   DegreesPerSecond.of(roboGyro.getRollVelocity()),
+																	   DegreesPerSecond.of(roboGyro.getYawVelocity()))))
+		 .save();
+
+// Get MegaTag2 pose
+Optional<PoseEstimate> visionEstimate = limelight3.createPoseEstimator(EstimationMode.MEGATAG2).getPoseEstimate();
+// If the pose is present
+visionEstimate.ifPresent((PoseEstimate poseEstimate) -> {
+  // Add it to the pose estimator.
+  poseEstimator.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
+});
+
+// Alternatively you can do
+Optional<PoseEstimate>  BotPose.BLUE_MEGATAG.get(limelight3);
+// If the pose is present
+visionEstimate.ifPresent((PoseEstimate poseEstimate) -> {
+    // Add it to the pose estimator.
+    poseEstimator.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds);
+    });*/
   }
 
   @Override

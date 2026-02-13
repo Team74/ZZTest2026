@@ -32,6 +32,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,6 +49,9 @@ import limelight.networktables.LimelightResults;
 import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
 import limelight.networktables.LimelightPoseEstimator.EstimationMode;
+import limelight.networktables.LimelightPoseEstimator;
+import org.photonvision.PhotonPoseEstimator;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -174,6 +178,10 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+    Limelight limelight = new Limelight("limelight-bot");
+
+    Optional<LimelightResults> results = limelight.getLatestResults();
+
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest)
     {
@@ -197,7 +205,9 @@ public class SwerveSubsystem extends SubsystemBase
 
     Optional<PoseEstimate>     poseEstimates = limelightPoseEstimator.getPoseEstimate();
     Optional<LimelightResults> results       = limelight.getLatestResults();
-    if (results.isPresent()/* && poseEstimates.isPresent()*/)
+    if (results.isPresent() && poseEstimates.isPresent())
+    
+
     {
       LimelightResults result       = results.get();
       PoseEstimate     poseEstimate = poseEstimates.get();
