@@ -34,14 +34,13 @@ public class Turret_Shoot {
     DigitalInput testinput2026 = new DigitalInput(2);
     XboxController driveController = new XboxController(0);
     TalonFX armMotor = new TalonFX(3);
-    //wheel spin
-    public void setRPM(){
-
+    
+    public void setRPM(){ //limit switch for motors
         if (driveController.getRightTriggerAxis()> 0 && testinput2026.get()){
-
+            setRPM();
           //if (testinput2026.get() && AngularVelocityUnit.RPM > 40 && RPM < 30){
             Shoot_Motor.getVelocity();
-        System.out.println("reach MAX speed");
+        System.out.println("test speed");
         }
         
     }
