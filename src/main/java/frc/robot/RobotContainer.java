@@ -187,6 +187,8 @@ private final SendableChooser<Command> autoChooser;
   void IntakeSubsystem() {
 driverXbox.a().onTrue(intake.Swap()).whileFalse(intake.Moveintake());
 
+//driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
+
 driverXbox.leftBumper().onTrue(intake.intakeOut());
 
 driverXbox.rightBumper().onTrue(intake.intakeIn());
