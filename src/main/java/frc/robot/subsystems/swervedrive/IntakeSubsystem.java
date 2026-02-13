@@ -38,7 +38,7 @@ public class IntakeSubsystem extends SubsystemBase{
         intakeMoverMax = new SparkMax(33, MotorType.kBrushless);
         intakeMoverMax.getEncoder().setPosition(81);
         isIntakeOut = false;
-thing = new SparkMaxConfig();
+        thing = new SparkMaxConfig();
 
     thing.smartCurrentLimit(105);
     intakeMoverMax.configure(thing, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -73,6 +73,7 @@ thing = new SparkMaxConfig();
 
             intakeMoverMax.set(pidTarget);
     });}
+
 
     public Command Swap(){
         return run(()->{
