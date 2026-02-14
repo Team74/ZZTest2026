@@ -190,13 +190,18 @@ operatorXbox.a().onTrue(intake.Swap()).whileFalse(intake.Moveintake());
 
 //driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
 
+//moves hood when bumper is pressed
 operatorXbox.leftBumper().onTrue(intake.MoveHoodOut());
 operatorXbox.rightBumper().onTrue(intake.MoveHoodIn());
 
-operatorXbox.leftBumper().onTrue(intake.intakeOut());
+//stops when not pressed
+operatorXbox.leftBumper().onFalse(intake.StopHood());
+operatorXbox.rightBumper().onFalse(intake.StopHood());
 
-operatorXbox.rightBumper().onTrue(intake.intakeIn());
+//operatorXbox.leftBumper().onTrue(intake.intakeOut());
 
-operatorXbox.rightBumper().or(operatorXbox.leftBumper()).whileFalse(intake.intakeStop());
+//operatorXbox.rightBumper().onTrue(intake.intakeIn());
+
+//operatorXbox.rightBumper().or(operatorXbox.leftBumper()).whileFalse(intake.intakeStop());
   }
 }

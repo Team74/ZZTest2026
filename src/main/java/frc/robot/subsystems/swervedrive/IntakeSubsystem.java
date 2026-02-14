@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import limelight.Limelight;
 
 public class IntakeSubsystem extends SubsystemBase{
 
@@ -29,6 +30,7 @@ public class IntakeSubsystem extends SubsystemBase{
     double lim;
     XboxController driveController = new XboxController(0);
     XboxController operatorController = new XboxController(1);
+    Limelight limelight3 = new Limelight("limelight3");
 
     public IntakeSubsystem(){
         intakeMax = new SparkMax(12, MotorType.kBrushless);
@@ -77,10 +79,22 @@ public class IntakeSubsystem extends SubsystemBase{
             intakeMoverMax.set(pidTarget);
     });}
 
+    /*public Command hoodLimeTarget(){
+
+         float KpDistance = -0.1f;  // Proportional control constant for distance
+        float current_distance = Estimate_Distance();  // see the 'Case Study: Estimating Distance' 
+
+         return run(()->{
+            hoodMotor.set(0.25);
+        });
+
+    }*/
+
     public Command MoveHoodOut(){
 
         return run(()->{
             hoodMotor.set(0.25);
+         
         });
 
     }
@@ -89,10 +103,19 @@ public class IntakeSubsystem extends SubsystemBase{
 
         return run(()->{
             hoodMotor.set(-0.25);
+           
         });
 
     }
 
+    public Command StopHood(){
+
+        return run(()->{
+            hoodMotor.set(0);
+            
+        });
+
+    }
 
     public Command Swap(){
         return run(()->{
