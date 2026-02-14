@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase{
 
     SparkMax intakeMax;
+    SparkMax hoodMotor;
    
     double speed;
     
@@ -27,9 +28,11 @@ public class IntakeSubsystem extends SubsystemBase{
     double target;
     double lim;
     XboxController driveController = new XboxController(0);
+    XboxController operatorController = new XboxController(1);
 
     public IntakeSubsystem(){
         intakeMax = new SparkMax(12, MotorType.kBrushless);
+        hoodMotor = new SparkMax(3, MotorType.kBrushless); 
         
         intakePID = new PIDController(.05, 0, 0);
         intakePID.setTolerance(0.1);
@@ -43,7 +46,7 @@ public class IntakeSubsystem extends SubsystemBase{
     thing.smartCurrentLimit(105);
     intakeMoverMax.configure(thing, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         lim = intakeMoverMax.configAccessor.getSmartCurrentLimit();
-        driveController = new XboxController(0);
+        //driveController = new XboxController(0);
 
     }
     public Command intakeIn(){
@@ -73,6 +76,22 @@ public class IntakeSubsystem extends SubsystemBase{
 
             intakeMoverMax.set(pidTarget);
     });}
+
+    public Command MoveHoodOut(){
+
+        return run(()->{
+            hoodMotor.set(0.25);
+        });
+
+    }
+
+    public Command MoveHoodIn(){
+
+        return run(()->{
+            hoodMotor.set(-0.25);
+        });
+
+    }
 
 
     public Command Swap(){

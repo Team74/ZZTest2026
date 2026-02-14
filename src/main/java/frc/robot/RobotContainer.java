@@ -40,6 +40,7 @@ public class RobotContainer
   
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final         CommandXboxController operatorXbox = new CommandXboxController(1);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/Kraken"));
 private final SendableChooser<Command> autoChooser;
@@ -185,14 +186,17 @@ private final SendableChooser<Command> autoChooser;
 
 
   void IntakeSubsystem() {
-driverXbox.a().onTrue(intake.Swap()).whileFalse(intake.Moveintake());
+operatorXbox.a().onTrue(intake.Swap()).whileFalse(intake.Moveintake());
 
 //driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
 
-driverXbox.leftBumper().onTrue(intake.intakeOut());
+operatorXbox.leftBumper().onTrue(intake.MoveHoodOut());
+operatorXbox.rightBumper().onTrue(intake.MoveHoodIn());
 
-driverXbox.rightBumper().onTrue(intake.intakeIn());
+operatorXbox.leftBumper().onTrue(intake.intakeOut());
 
-driverXbox.rightBumper().or(driverXbox.leftBumper()).whileFalse(intake.intakeStop());
+operatorXbox.rightBumper().onTrue(intake.intakeIn());
+
+operatorXbox.rightBumper().or(operatorXbox.leftBumper()).whileFalse(intake.intakeStop());
   }
 }
