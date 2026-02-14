@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -26,23 +27,22 @@ import java.lang.ModuleLayer.Controller;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.spark.config.LimitSwitchConfig;
-import com.revrobotics.spark.config.LimitSwitchConfigAccessor;
+import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
+import com.revrobotics.spark.SparkMax;
+
 
 public class Turret_Shoot {
-    TalonFX Shoot_Motor = new TalonFX(74); 
-    DigitalInput testinput2026 = new DigitalInput(2);
-    XboxController driveController = new XboxController(0);
-    TalonFX armMotor = new TalonFX(3);
-    
-    public void setRPM(){ //limit switch for motors
-        if (driveController.getRightTriggerAxis()> 0 && testinput2026.get()){
-            setRPM();
-          //if (testinput2026.get() && AngularVelocityUnit.RPM > 40 && RPM < 30){
-            Shoot_Motor.getVelocity();
-        System.out.println("test speed");
-        }
-        
-    }
+    TalonFX shooter = new TalonFX(Constants.ShooterConstants.ShooterMotorID);
+    SparkMax feeder = new SparkMax(Constants.ShooterConstants.FeederMotorID,MotorType.kBrushless);
+    XboxController controller = new XboxController(0);
 
+     public void shooter(){
+        if (controller.getRightTriggerAxis() > 0.1){
+            shooter.set(0.5);
+            feeder.set(0.5);
+        } else {
+            shooter.set(0);
+            feeder.set(0);
+        }
+    }
 }
