@@ -51,4 +51,10 @@ public final class Constants
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT    = 6;
   }
+  public static class ShooterConstants{
+    public static final int HoodMotorID = 90;
+    public static final int ShooterMotorID = 46;
+    public static final int FeederMotorID = 13;
+
+  }
 }
