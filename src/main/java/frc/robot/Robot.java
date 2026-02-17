@@ -75,6 +75,7 @@ public class Robot extends TimedRobot
 
   private RobotContainer m_robotContainer;
   XboxController driveController = new XboxController(0);
+  XboxController operatorController = new XboxController(1);
   Pigeon2 roboGyro = new Pigeon2(2);
   private Timer disabledTimer;
   AnalogPotentiometer stringPot = new AnalogPotentiometer(0);
