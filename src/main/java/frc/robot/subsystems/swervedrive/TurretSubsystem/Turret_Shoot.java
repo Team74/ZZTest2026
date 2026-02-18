@@ -33,7 +33,7 @@ import com.revrobotics.spark.SparkMax;
 
 public class Turret_Shoot {
     TalonFX shooter = new TalonFX(Constants.ShooterConstants.ShooterMotorID);
-    SparkMax feeder = new SparkMax(Constants.ShooterConstants.FeederMotorID,MotorType.kBrushless);
+    SparkMax feeder = new SparkMax(Constants.ShooterConstants.FeederMotorID,  com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     XboxController controller = new XboxController(0);
 
      public void shooter(){

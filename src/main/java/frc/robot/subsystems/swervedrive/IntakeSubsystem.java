@@ -33,15 +33,15 @@ public class IntakeSubsystem extends SubsystemBase{
     Limelight limelight3 = new Limelight("limelight3");
 
     public IntakeSubsystem(){
-        intakeMax = new SparkMax(12, MotorType.kBrushless);
+        intakeMax = new SparkMax(33, MotorType.kBrushless);
         hoodMotor = new SparkMax(3, MotorType.kBrushless); 
         
         intakePID = new PIDController(.05, 0, 0);
         intakePID.setTolerance(0.1);
         intakePID.disableContinuousInput();
 
-        intakeMoverMax = new SparkMax(33, MotorType.kBrushless);
-        intakeMoverMax.getEncoder().setPosition(81);
+        intakeMoverMax = new SparkMax(12, MotorType.kBrushless);
+        intakeMoverMax.getEncoder().setPosition(0);
         isIntakeOut = false;
         thing = new SparkMaxConfig();
 
@@ -74,9 +74,9 @@ public class IntakeSubsystem extends SubsystemBase{
         return run(()-> {
             var pidTarget = intakePID.calculate(intakeMoverMax.getEncoder().getPosition(), target);
            
-            System.out.println("pidTarget: " + pidTarget);
+     System.out.println("isIntakeOut: " + isIntakeOut + " target: + " + target + "Current Pos: " + intakeMoverMax.getEncoder().getPosition() + " Current: " + intakeMoverMax.getOutputCurrent() +" Current Lim: " + lim);
 
-            intakeMoverMax.set(pidTarget);
+            intakeMoverMax.set(pidTarget*.25);
     });}
 
     /*public Command hoodLimeTarget(){
@@ -121,16 +121,16 @@ public class IntakeSubsystem extends SubsystemBase{
         return run(()->{
                 var currentPos = intakeMoverMax.getEncoder().getPosition();
 
-                if(currentPos <= 78.73) {
+                if(currentPos >= 10) {
                     isIntakeOut = true;
                 }
-                else if(currentPos >= 80.9) {
+                else if(currentPos <= 1) {
                     isIntakeOut = false;
                 }
 
 
 
-                        System.out.println("isIntakeOut: " + isIntakeOut + " target: + " + target + "Current Pos: " + intakeMoverMax.getEncoder().getPosition() + " Current: " + intakeMoverMax.getOutputCurrent() +" Current Lim: " + lim);
+     System.out.println("isIntakeOut: " + isIntakeOut + " target: + " + target + "Current Pos: " + intakeMoverMax.getEncoder().getPosition() + " Current: " + intakeMoverMax.getOutputCurrent() +" Current Lim: " + lim);
 
             // if (intakePID.atSetpoint() && target > 78.73) {
             //     isIntakeOut = true;
@@ -139,10 +139,12 @@ public class IntakeSubsystem extends SubsystemBase{
             // }
 
             if (isIntakeOut){
-                target = 81;
+                // moving the target from 11.4 to zero
+                // 0 = in, 11.4 = out
+                target = 0;
             }
             if (!isIntakeOut) {
-                target = 78.73;
+                target = 11.4;
             }
 
 
