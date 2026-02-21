@@ -46,6 +46,7 @@ public class Turret_Shoot extends SubsystemBase {
   TalonFX shooterMotor = new TalonFX(Constants.ShooterConstants.ShooterMotorID);
   //SparkMax hoodMotor = new SparkMax(Constants.ShooterConstants.HoodMotorID, MotorType.kBrushless); 
   SparkMax towerMotor = new SparkMax(Constants.ShooterConstants.TowerMotorID, MotorType.kBrushless); 
+  double currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
 
   CurrentLimitsConfigs m_currentLimits = new CurrentLimitsConfigs()
     .withSupplyCurrentLimit(Constants.ShooterConstants.SupplyCurrentLimit)
@@ -76,9 +77,15 @@ public class Turret_Shoot extends SubsystemBase {
 
   public Command shoot(){
     return run(()->{
+        currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
+        System.out.println(currentRPS_Shooter);
+
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
-      towerMotor.set(-Constants.ShooterConstants.desiredRPS);
+      if (currentRPS_Shooter <= (Constants.ShooterConstants.desiredRPS * 0.75)) {
+        towerMotor.set(-Constants.ShooterConstants.desiredRPS);
+      }
+     
     });
   } 
 
