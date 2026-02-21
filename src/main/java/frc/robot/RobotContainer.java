@@ -22,6 +22,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Hood;
+import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Shoot;
+
 import java.io.File;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.swervedrive.IntakeSubsystem;
@@ -34,16 +37,19 @@ import frc.robot.subsystems.swervedrive.IntakeSubsystem;
 public class RobotContainer
 {
 
-  
 
-  IntakeSubsystem intake = new IntakeSubsystem();
   
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   final         CommandXboxController operatorXbox = new CommandXboxController(1);
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/Kraken"));
-private final SendableChooser<Command> autoChooser;
+  private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/Kraken"));
+  private final SendableChooser<Command> autoChooser;
+
+  private final Turret_Shoot shootSubsystem = new Turret_Shoot();
+  private final Turret_Hood hoodSubsystem = new Turret_Hood();
+  private final IntakeSubsystem intake = new IntakeSubsystem();
+  
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -85,6 +91,7 @@ private final SendableChooser<Command> autoChooser;
   {
     // Configure the trigger bindings
     configureBindings();
+    configureButtonBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -100,6 +107,10 @@ private final SendableChooser<Command> autoChooser;
    * {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
    * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
+  private void configureButtonBindings (){
+    Trigger B_Button = operatorXbox.b();
+    Trigger L_trigger = operatorXbox.leftTrigger();
+  }
   private void configureBindings()
   {
     Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
@@ -186,22 +197,22 @@ private final SendableChooser<Command> autoChooser;
 
 
   void IntakeSubsystem() {
-operatorXbox.a().onTrue(intake.Swap()).whileFalse(intake.Moveintake());
 
-//driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
 
-//moves hood when bumper is pressed
-operatorXbox.leftBumper().onTrue(intake.MoveHoodOut());
-operatorXbox.rightBumper().onTrue(intake.MoveHoodIn());
+    //flips intake in or out
+    operatorXbox.a().onTrue(intake.Swap()).whileFalse(intake.Moveintake());
 
-//stops when not pressed
-operatorXbox.leftBumper().onFalse(intake.StopHood());
-operatorXbox.rightBumper().onFalse(intake.StopHood());
+    //driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
+    
+    //spins intake flywheels
+    operatorXbox.leftTrigger().onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
 
-//operatorXbox.leftBumper().onTrue(intake.intakeOut());
+    //moves hood 
+    operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHoodOut()).whileFalse(hoodSubsystem.StopHood());
+    operatorXbox.rightBumper().onTrue(hoodSubsystem.MoveHoodIn()).whileFalse(hoodSubsystem.StopHood());
 
-//operatorXbox.rightBumper().onTrue(intake.intakeIn());
+    //shooter flywheels
+    operatorXbox.rightTrigger().onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
 
-//operatorXbox.rightBumper().or(operatorXbox.leftBumper()).whileFalse(intake.intakeStop());
   }
 }
