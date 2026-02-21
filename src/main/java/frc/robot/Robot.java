@@ -261,7 +261,7 @@ public class Robot extends TimedRobot
     int prototypetargetRPS = 0;
 
     if (driveController.getRightTriggerAxis() > 0.2){
-      prototypetargetRPS = 64;
+      prototypetargetRPS = -64;
     } else {
       prototypetargetRPS = 0;
     }
