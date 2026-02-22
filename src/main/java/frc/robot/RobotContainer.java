@@ -91,7 +91,7 @@ public class RobotContainer
   {
     // Configure the trigger bindings
     configureBindings();
-    configureButtonBindings();
+
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -107,10 +107,7 @@ public class RobotContainer
    * {@link CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
    * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
-  private void configureButtonBindings (){
-    Trigger B_Button = operatorXbox.b();
-    Trigger L_trigger = operatorXbox.leftTrigger();
-  }
+
   private void configureBindings()
   {
     Command driveFieldOrientedDirectAngle      = drivebase.driveFieldOriented(driveDirectAngle);
@@ -197,15 +194,20 @@ public class RobotContainer
 
 
   void IntakeSubsystem() {
+    Trigger B_Button = operatorXbox.b();
+    Trigger L_trigger = operatorXbox.leftTrigger();
+    Trigger R_Trigger = operatorXbox.rightTrigger();
 
-
+    Trigger IntakeReverseButton = B_Button.and(L_trigger);
+    Trigger ShooterReverseButton = B_Button.and(R_Trigger);
     //flips intake in or out
     operatorXbox.a().onTrue(intake.Swap()).whileFalse(intake.Moveintake());
 
     //driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
     
-    //spins intake flywheels
+    //spins intake flywheels 
     operatorXbox.leftTrigger().onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
+    IntakeReverseButton.onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
 
     //moves hood 
     operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHoodOut()).whileFalse(hoodSubsystem.StopHood());
@@ -213,6 +215,6 @@ public class RobotContainer
 
     //shooter flywheels
     operatorXbox.rightTrigger().onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
-
+    ShooterReverseButton.onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
   }
 }

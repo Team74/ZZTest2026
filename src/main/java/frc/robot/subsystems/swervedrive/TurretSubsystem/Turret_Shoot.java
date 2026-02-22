@@ -78,12 +78,25 @@ public class Turret_Shoot extends SubsystemBase {
   public Command shoot(){
     return run(()->{
         currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
-        System.out.println(currentRPS_Shooter);
-
+        
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
       if (currentRPS_Shooter <= (Constants.ShooterConstants.desiredRPS * 0.75)) {
         towerMotor.set(-Constants.ShooterConstants.desiredRPS);
+      }
+     
+    });
+  } 
+
+   public Command reverseShoot(){
+    return run(()->{
+        currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
+        
+
+      var request = new VelocityVoltage(0).withSlot(0);
+      shooterMotor.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
+      if (currentRPS_Shooter >= (Constants.ShooterConstants.desiredRPS * -0.75)) {
+        towerMotor.set(Constants.ShooterConstants.desiredRPS);
       }
      
     });
