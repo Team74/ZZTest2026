@@ -7,6 +7,7 @@ package frc.robot.subsystems.swervedrive;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -83,12 +85,13 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean     visionDriveTest = false;
+  private final boolean     visionDriveTest = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
   // private       Vision      vision;
-
+  Pigeon2 gyro = new Pigeon2(Constants.DrivebaseConstants.GyroID);
+  private Field2d m_field = new Field2d();
   Limelight               limelight;  
     LimelightPoseEstimator  limelightPoseEstimator;
   /**
@@ -148,7 +151,7 @@ public class SwerveSubsystem extends SubsystemBase
                 Units.inchesToMeters(12),
                 Units.inchesToMeters(10.5),
                 new Rotation3d(0, 0, Units.degreesToRadians(45))))
-        .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
+        //.withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
         .save();
     limelightPoseEstimator = limelight.createPoseEstimator(EstimationMode.MEGATAG2);
   }
@@ -179,9 +182,15 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+      // This will get the simulated sensor readings that we set
+    // in the previous article while in simulation, but will use
+    // real values on the robot itself.
+      swerveDrive.updateOdometry();
+      m_field.setRobotPose(swerveDrive.getPose());
+      
     if (visionDriveTest)
     {
-      // swerveDrive.updateOdometry();
+      //swerveDrive.updateOdometry();
       UpdatePoseEstimation_LL();
     }
   }
@@ -210,6 +219,7 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putNumber("LL Pose_x", poseEstimate.pose.getX());
       SmartDashboard.putNumber("LL Pose_y", poseEstimate.pose.getY());
       SmartDashboard.putNumber("LL Pose_degrees", poseEstimate.pose.toPose2d().getRotation().getDegrees());
+      SmartDashboard.putData("Field", m_field);
       
       if (result.valid) {
         Pose2d usefulPose = result.getBotPose2d(Alliance.Blue);
