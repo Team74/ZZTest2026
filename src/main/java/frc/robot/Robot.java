@@ -80,7 +80,7 @@ public class Robot extends TimedRobot
   private Timer disabledTimer;
   AnalogPotentiometer stringPot = new AnalogPotentiometer(0);
 
-  Limelight limelight3 = new Limelight("limelight3");
+  // Limelight limelight3 = new Limelight("limelight3");
 
 
   Field2d m_field = new Field2d();
@@ -131,10 +131,10 @@ public class Robot extends TimedRobot
 
     //THIS CODE IS FOR YALL I HAVE NO IDEA IF IT WILL WORK
     // Set the limelight to use Pipeline LED control, with the Camera offset of 0, and save.
-    limelight3.getSettings()
-           .withLimelightLEDMode(LEDMode.PipelineControl)
-           .withCameraOffset(Pose3d.kZero)
-           .save();
+    // limelight3.getSettings()
+    //        .withLimelightLEDMode(LEDMode.PipelineControl)
+    //        .withCameraOffset(Pose3d.kZero)
+    //        .save();
 
     //https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/field2d-widget.html
     m_field = new Field2d();

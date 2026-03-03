@@ -83,7 +83,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean     visionDriveTest = false;
+  private final boolean     visionDriveTest = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -148,7 +148,7 @@ public class SwerveSubsystem extends SubsystemBase
                 Units.inchesToMeters(12),
                 Units.inchesToMeters(10.5),
                 new Rotation3d(0, 0, Units.degreesToRadians(45))))
-        .withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
+        //.withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
         .save();
     limelightPoseEstimator = limelight.createPoseEstimator(EstimationMode.MEGATAG2);
   }
@@ -179,9 +179,11 @@ public class SwerveSubsystem extends SubsystemBase
   @Override
   public void periodic()
   {
+    //swerveDrive.updateField2d() ;
+
     if (visionDriveTest)
     {
-      // swerveDrive.updateOdometry();
+      swerveDrive.updateOdometry();
       UpdatePoseEstimation_LL();
     }
   }
@@ -190,6 +192,7 @@ public class SwerveSubsystem extends SubsystemBase
   private boolean initialReading = false;
 
   public void UpdatePoseEstimation_LL() {
+
     limelight
         .getSettings()
         .withRobotOrientation(
@@ -204,6 +207,8 @@ public class SwerveSubsystem extends SubsystemBase
     if (results.isPresent() /* && poseEstimates.isPresent()*/) {
       LimelightResults result = results.get();
       PoseEstimate poseEstimate = poseEstimates.get();
+
+
 
       SmartDashboard.putNumber("LL Avg Tag Area", poseEstimate.avgTagArea);
       SmartDashboard.putNumber("LL Avg Distance", poseEstimate.avgTagDist);
@@ -492,7 +497,7 @@ public class SwerveSubsystem extends SubsystemBase
    * @param angularRotationX Angular velocity of the robot to set. Cubed for smoother controls.
    * @return Drive command.
    */
-  public Command driveCommand(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
+  public Command driveCommand111(DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier angularRotationX)
   {
     return run(() -> {
       // Make the robot move
