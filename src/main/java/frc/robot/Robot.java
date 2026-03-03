@@ -76,7 +76,7 @@ public class Robot extends TimedRobot
   private RobotContainer m_robotContainer;
   XboxController driveController = new XboxController(0);
   XboxController operatorController = new XboxController(1);
-  Pigeon2 roboGyro = new Pigeon2(2);
+  //Pigeon2 roboGyro = new Pigeon2(2);
   private Timer disabledTimer;
   AnalogPotentiometer stringPot = new AnalogPotentiometer(0);
 
@@ -156,6 +156,8 @@ public class Robot extends TimedRobot
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    
   }
 
   /**
