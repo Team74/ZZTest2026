@@ -196,7 +196,7 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
   private int     outofAreaReading = 0;
-  private boolean initialReading = true;
+  private boolean initialReading = false;
 
   public void UpdatePoseEstimation_LL() {
     limelight
