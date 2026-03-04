@@ -201,13 +201,14 @@ public class RobotContainer
     Trigger IntakeReverseButton = B_Button.and(L_trigger);
     Trigger ShooterReverseButton = B_Button.and(R_Trigger);
     //flips intake in or out
-    operatorXbox.a().onTrue(intake.Swap()).whileFalse(intake.Moveintake());
+    // operatorXbox.a().onTrue(intake.Swap());
+    operatorXbox.a().whileTrue(intake.Swap());
 
     //driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
     
     //spins intake flywheels 
-    operatorXbox.leftTrigger().onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
-    IntakeReverseButton.onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
+ //   operatorXbox.leftTrigger().onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
+   // IntakeReverseButton.onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
 
     //moves hood 
     operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHoodOut()).whileFalse(hoodSubsystem.StopHood());
