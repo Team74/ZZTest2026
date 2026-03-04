@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -24,9 +25,12 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Hood;
 import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Shoot;
+import frc.robot.subsystems.swervedrive.LEDs;
 
 
 import java.io.File;
+import java.util.function.BooleanSupplier;
+
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.swervedrive.IntakeSubsystem;
 
@@ -50,6 +54,7 @@ public class RobotContainer
   private final Turret_Shoot shootSubsystem = new Turret_Shoot();
   private final Turret_Hood hoodSubsystem = new Turret_Hood();
   private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final LEDs led = new LEDs();
   
  
 
@@ -131,7 +136,8 @@ public class RobotContainer
     }
 
     IntakeSubsystem();
-
+    LEDs();
+    
     if (Robot.isSimulation())
     {
       Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
@@ -193,7 +199,9 @@ public class RobotContainer
   {
     drivebase.setMotorBrake(brake);
   }
-
+void LEDs() {
+  led.ColorChange(led.HubTimer()).repeatedly();
+}
 
   void IntakeSubsystem() {
     Trigger B_Button = operatorXbox.b();
@@ -208,7 +216,7 @@ public class RobotContainer
     //driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
     
     //spins intake flywheels 
-    operatorXbox.leftTrigger().onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
+    operatorXbox.leftTrigger().and(B_Button.negate()).onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
     IntakeReverseButton.onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
 
     //moves hood 
@@ -216,7 +224,7 @@ public class RobotContainer
     operatorXbox.rightBumper().onTrue(hoodSubsystem.MoveHoodIn()).whileFalse(hoodSubsystem.StopHood());
 
     //shooter flywheels
-    operatorXbox.rightTrigger().onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
+    operatorXbox.rightTrigger().and(B_Button.negate()).onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
     ShooterReverseButton.onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
   }
 }
