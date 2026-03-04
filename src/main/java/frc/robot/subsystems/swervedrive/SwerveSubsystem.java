@@ -196,7 +196,7 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
   private int     outofAreaReading = 0;
-  private boolean initialReading = false;
+  private boolean initialReading = true;
 
   public void UpdatePoseEstimation_LL() {
     limelight
@@ -222,7 +222,7 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putData("Field", m_field);
       
       if (result.valid) {
-        Pose2d usefulPose = result.getBotPose2d(Alliance.Red); //testing if its inverted from blue to Red
+        Pose2d usefulPose = result.getBotPose2d(Alliance.Blue);
         double distanceToPose = usefulPose.getTranslation().getDistance(swerveDrive.getPose().getTranslation());
         if (distanceToPose < 0.5 || (outofAreaReading > 10) || (outofAreaReading > 10 && !initialReading)) {
           if (!initialReading) {
