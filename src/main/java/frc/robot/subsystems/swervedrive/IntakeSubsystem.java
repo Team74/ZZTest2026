@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swervedrive;
 
+import java.lang.invoke.VarHandle;
+
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -9,6 +11,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogTrigger;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -24,27 +27,47 @@ import frc.robot.Constants;
 import limelight.Limelight;
 
 public class IntakeSubsystem extends SubsystemBase{
+  SparkMax intakeMax;
+  SparkMax intakeMoverMax;
 
-    SparkMax intakeMax = new SparkMax(Constants.IntakeConstants.FeederMotorID, MotorType.kBrushless);
-    SparkMax intakeMoverMax = new SparkMax(Constants.IntakeConstants.MoverMotorID, MotorType.kBrushless);
-   
-    DigitalInput m_toplimitswitch = new DigitalInput(0);
-    DigitalInput m_bottomlimitswitch = new DigitalInput(1);
+  DigitalInput m_toplimitswitch = new DigitalInput(0);
+  DigitalInput m_bottomlimitswitch = new DigitalInput(1);
 
-    double intakeMoverSpeedConstant = 0.5;
-    double intakeMoverSpeed = intakeMoverSpeedConstant;
+  double intakeMoverSpeedConstant = 0.5;
+  double intakeMoverSpeed;
 
-    double intakeSpeed = 0.5;
+  double intakeSpeed = 0.5;
 
-    boolean topLimitSwitchTriggered = false;
-    boolean botLimitSwitchTriggered = false;
-    
-    // Directions: false -> toward in (up), true -> toward out (down)
-    boolean isIntakeOut;
+  boolean topLimitSwitchTriggered = false;
+  boolean botLimitSwitchTriggered = false;
 
-     public IntakeSubsystem(){     
-      isIntakeOut = false;
-    }
+  // Directions: false -> toward in (up), true -> toward out (down)
+  boolean isIntakeOut;
+  boolean isTopPressed;
+  boolean isBottomPressed;
+  public IntakeSubsystem(){     
+    intakeMax = new SparkMax(Constants.IntakeConstants.FeederMotorID, MotorType.kBrushless);
+    intakeMoverMax = new SparkMax(Constants.IntakeConstants.MoverMotorID, MotorType.kBrushless);
+    isIntakeOut = false;
+  }
+
+  public Command intakeIn(){
+    return run(()->{
+      intakeMax.set(intakeSpeed);
+    });
+  } 
+
+  public Command intakeOut(){
+    return run(()->{
+      intakeMax.set(-intakeSpeed);
+    });
+  } 
+
+  public Command intakeStop(){
+    return run(()->{
+      intakeMax.set(0);
+    });
+  } 
 
 
   public Command Swap(){
@@ -53,41 +76,50 @@ public class IntakeSubsystem extends SubsystemBase{
        * 
        * Swaps the direction the intake mechanism is moving.
        */
-      return run( () -> {
+    return run( () -> {
         
-        var isTopPressed = m_toplimitswitch.get();
-        var isBottomPressed = m_bottomlimitswitch.get();
+      isTopPressed = m_toplimitswitch.get();
+      isBottomPressed = m_bottomlimitswitch.get();
+       
+      if (isBottomPressed && isIntakeOut){
 
-        if (isTopPressed == true){
-          System.out.println("STOP UP");
-          isIntakeOut = false;
-          System.out.println("isIntakeOut:" + isIntakeOut);
-          intakeMoverSpeed = 0;
-  
-        }
-        if (isBottomPressed == true){
-          System.out.println("STOP DOWN");
-          isIntakeOut = true;          
-          System.out.println("isIntakeOut:" + isIntakeOut);
-          intakeMoverSpeed = 0;
-        }
+      }
+             
 
-        if (isIntakeOut == false){
-          intakeMoverSpeed = -intakeMoverSpeedConstant;
+      if (isTopPressed){
+        System.out.println("STOP UP");
+        isIntakeOut = false;
+        System.out.println("isIntakeOut:" + isIntakeOut);
+      }
 
-        }
-        if (isIntakeOut == true){
-          intakeMoverSpeed = intakeMoverSpeedConstant;
+      if (isBottomPressed){
+        System.out.println("STOP DOWN");
+        isIntakeOut = true;          
+      }
+    });
+  }
+  public Command MoveIntake(){
     
-        }
-
-        if (isTopPressed || isBottomPressed){
-          intakeMoverSpeed = 0;
-
-        }
-        intakeMax.set(intakeSpeed);
-        intakeMoverMax.set(intakeMoverSpeed);
-        System.out.println (intakeMoverSpeed);
+    return run(()->{
+      
+            if (isIntakeOut == false){
+              intakeMoverSpeed = -intakeMoverSpeedConstant;
+            }
+      
+            if (isIntakeOut == true){
+              intakeMoverSpeed = intakeMoverSpeedConstant;
+            }
+      
+            if (isTopPressed){
+              intakeMoverSpeed = MathUtil.clamp(intakeMoverSpeed,0,0);
+            }
+            if (isBottomPressed){
+              intakeMoverSpeed = MathUtil.clamp(intakeMoverSpeed,0,0);
+            }
+      
+            intakeMoverMax.set(intakeMoverSpeed);
+            System.out.println (intakeMoverSpeed);
+    
       });
     }
 }

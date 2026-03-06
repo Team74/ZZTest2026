@@ -90,6 +90,13 @@ public class RobotContainer
                                                                     .deadband(OperatorConstants.DEADBAND)
                                                                     .scaleTranslation(0.8)
                                                                     .allianceRelativeControl(true);
+                                                                      // Derive the heading axis with math!
+                                                                    SwerveInputStream driveDirectAngleKeyboard     = driveAngularVelocityKeyboard.copy()
+                                                                    .withControllerHeadingAxis(() -> Math.sin(driverXbox.getRawAxis(2) * Math.PI) * (Math.PI * 2),
+                                                                    () -> Math.cos(driverXbox.getRawAxis(2) * Math.PI) * (Math.PI * 2))
+                                                                    .headingWhile(true)
+                                                                    .translationHeadingOffset(true)
+                                                                    .translationHeadingOffset(Rotation2d.fromDegrees(0));
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -134,7 +141,8 @@ public class RobotContainer
     IntakeSubsystem();
     LEDs();
     
-    if (Robot.isSimulation())
+  /*  commented out for now because 
+  if (Robot.isSimulation())
     {
       Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
 
@@ -150,12 +158,14 @@ public class RobotContainer
       driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true), () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
 
+
 //      driverXbox.b().whileTrue(
 //          drivebase.driveToPose(
 //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
 //                              );
 
     }
+    */
     if (DriverStation.isTest())
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
@@ -199,29 +209,25 @@ void LEDs() {
   led.ColorChange(led.HubTimer()).repeatedly();
 }
 
-  void IntakeSubsystem() {
-    Trigger B_Button = operatorXbox.b();
-    Trigger L_trigger = operatorXbox.leftTrigger();
-    Trigger R_Trigger = operatorXbox.rightTrigger();
-
-    Trigger IntakeReverseButton = B_Button.and(L_trigger);
-    Trigger ShooterReverseButton = B_Button.and(R_Trigger);
-    //flips intake in or out
-    // operatorXbox.a().onTrue(intake.Swap());
-    operatorXbox.a().whileTrue(intake.Swap());
-
-    //driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
-    
-    //spins intake flywheels 
-    operatorXbox.leftTrigger().and(B_Button.negate()).onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
-    IntakeReverseButton.onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
+  void TurretSubsystem() {
+    //shooter flywheels
+    operatorXbox.leftTrigger().and(operatorXbox.b().negate()).onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
+    // reverse
+    operatorXbox.leftTrigger().and(operatorXbox.b()).onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
 
     //moves hood 
     operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHoodOut()).whileFalse(hoodSubsystem.StopHood());
+    // reverse
     operatorXbox.rightBumper().onTrue(hoodSubsystem.MoveHoodIn()).whileFalse(hoodSubsystem.StopHood());
+  }
 
-    //shooter flywheels
-    operatorXbox.rightTrigger().and(B_Button.negate()).onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
-    ShooterReverseButton.onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
+  void IntakeSubsystem() {
+    //flips intake in or out
+    operatorXbox.a().onTrue(intake.Swap());
+    intake.MoveIntake().repeatedly();
+    //spins intake flywheels 
+    operatorXbox.leftTrigger().and(operatorXbox.b().negate()).onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
+    //reverse
+    operatorXbox.leftTrigger().and(operatorXbox.b()).onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
   }
 }

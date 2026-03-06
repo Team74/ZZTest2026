@@ -44,8 +44,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Turret_Shoot extends SubsystemBase {
   TalonFX shooterMotor = new TalonFX(Constants.ShooterConstants.ShooterMotorID);
-  //SparkMax hoodMotor = new SparkMax(Constants.ShooterConstants.HoodMotorID, MotorType.kBrushless); 
+  TalonFX shooterMotor2 = new TalonFX(Constants.ShooterConstants.ShooterMotor2ID);
   SparkMax towerMotor = new SparkMax(Constants.ShooterConstants.TowerMotorID, MotorType.kBrushless); 
+ 
   double currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
 
   CurrentLimitsConfigs m_currentLimits = new CurrentLimitsConfigs()
@@ -73,6 +74,8 @@ public class Turret_Shoot extends SubsystemBase {
   public Turret_Shoot() {
     shooterMotor.getConfigurator().apply(toConfigure);
     shooterMotor.setNeutralMode(NeutralModeValue.Brake);
+    shooterMotor2.getConfigurator().apply(toConfigure);
+    shooterMotor2.setNeutralMode(NeutralModeValue.Brake);
   }
 
   public Command shoot(){
@@ -81,6 +84,7 @@ public class Turret_Shoot extends SubsystemBase {
         
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
+      shooterMotor2.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
       if (currentRPS_Shooter <= (Constants.ShooterConstants.desiredRPS * 0.75)) {
         towerMotor.set(-Constants.ShooterConstants.desiredRPS);
       }
@@ -95,6 +99,7 @@ public class Turret_Shoot extends SubsystemBase {
 
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
+      shooterMotor2.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
       if (currentRPS_Shooter >= (Constants.ShooterConstants.desiredRPS * -0.75)) {
         towerMotor.set(Constants.ShooterConstants.desiredRPS);
       }
@@ -106,25 +111,8 @@ public class Turret_Shoot extends SubsystemBase {
     return run(()->{
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(0));
+      shooterMotor2.setControl(request.withVelocity(0));     
       towerMotor.set(0);
     });
   } 
-
-  /*public Command MoveHoodOut(){
-    return run(()->{
-      hoodMotor.set(hoodSpeed);
-    });
-  }
-
-  public Command MoveHoodIn(){
-    return run(()->{
-      hoodMotor.set(-hoodSpeed);
-    });
-  }
-
-  public Command StopHood(){
-    return run(()->{
-      hoodMotor.set(0);
-    });
-  }*/
 }
