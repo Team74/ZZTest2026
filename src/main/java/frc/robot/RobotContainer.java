@@ -32,6 +32,7 @@ import java.io.File;
 import java.util.function.BooleanSupplier;
 
 import swervelib.SwerveInputStream;
+import frc.robot.subsystems.swervedrive.ClimberSubsystem;
 import frc.robot.subsystems.swervedrive.IntakeSubsystem;
 
 /**
@@ -55,6 +56,7 @@ public class RobotContainer
   private final Turret_Hood hoodSubsystem = new Turret_Hood();
   private final IntakeSubsystem intake = new IntakeSubsystem();
  // private final LEDs led = new LEDs();
+  private final ClimberSubsystem Climber = new ClimberSubsystem();
   
  
 
@@ -137,9 +139,9 @@ public class RobotContainer
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
-
-    IntakeSubsystem();
     TurretSubsystem();
+    IntakeSubsystem();
+    ClimberSubsystem();
     LEDs();
     
   /*  commented out for now because 
@@ -234,5 +236,14 @@ void LEDs() {
     operatorXbox.leftTrigger().and(operatorXbox.b().negate()).onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
     //reverse
     operatorXbox.leftTrigger().and(operatorXbox.b()).onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
+  }
+  
+  void ClimberSubsystem() {
+    // up on the D-Pad goes up
+    operatorXbox.povUp().whileTrue(Climber.ClimbUp());
+    // down on the D-Pad goes down
+    operatorXbox.povDown().whileTrue(Climber.ClimbDown());
+    // neither being pressed stops the motor
+    operatorXbox.povUp().and(operatorXbox.povDown()).whileFalse(Climber.ClimbStop());
   }
 }
