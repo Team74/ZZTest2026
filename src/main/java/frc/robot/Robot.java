@@ -29,29 +29,16 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import limelight.networktables.AngularVelocity3d;
-import limelight.networktables.LimelightResults;
-import limelight.networktables.LimelightPoseEstimator.EstimationMode;
-import limelight.networktables.LimelightSettings.LEDMode;
-import limelight.networktables.Orientation3d;
-import limelight.networktables.PoseEstimate;
-import limelight.networktables.target.pipeline.NeuralClassifier;
 import swervelib.SwerveDrive;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.Publisher;
-import limelight.Limelight;
-import limelight.networktables.AngularVelocity3d;
-import limelight.networktables.LimelightPoseEstimator;
-import limelight.networktables.LimelightResults;
-import limelight.networktables.Orientation3d;
-import limelight.networktables.PoseEstimate;
-import limelight.networktables.LimelightPoseEstimator.EstimationMode;
 
 
 
@@ -65,8 +52,6 @@ public class Robot extends TimedRobot
 
    File directory = new File(Filesystem.getDeployDirectory(),"swerve");
    static SwerveDrive             swerveDrive;
-    Limelight               limelight;  
-    LimelightPoseEstimator  limelightPoseEstimator;
     
 
   private static Robot   instance;
@@ -79,8 +64,6 @@ public class Robot extends TimedRobot
   //Pigeon2 roboGyro = new Pigeon2(2);
   private Timer disabledTimer;
   AnalogPotentiometer stringPot = new AnalogPotentiometer(0);
-
-  Limelight limelight3 = new Limelight("limelight3");
 
 
   Field2d m_field = new Field2d();
@@ -116,6 +99,8 @@ public class Robot extends TimedRobot
     // // USB Index 0: http://(robotIP):5801 (UI), http://(robotIP):5800 (stream)
     // // USB Index 1: http://(robotIP):5811 (UI), http://(robotIP):5810 (stream)
   
+PortForwarder.add(5801, "limelight-bot.local", 5801);
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -131,10 +116,10 @@ public class Robot extends TimedRobot
 
     //THIS CODE IS FOR YALL I HAVE NO IDEA IF IT WILL WORK
     // Set the limelight to use Pipeline LED control, with the Camera offset of 0, and save.
-    limelight3.getSettings()
-           .withLimelightLEDMode(LEDMode.PipelineControl)
-           .withCameraOffset(Pose3d.kZero)
-           .save();
+    // limelight3.getSettings()
+    //        .withLimelightLEDMode(LEDMode.PipelineControl)
+    //        .withCameraOffset(Pose3d.kZero)
+    //        .save();
 
     //https://docs.wpilib.org/en/stable/docs/software/dashboards/glass/field2d-widget.html
     m_field = new Field2d();

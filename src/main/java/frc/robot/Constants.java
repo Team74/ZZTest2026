@@ -59,9 +59,10 @@ public final class Constants
   }
 
   public static class ShooterConstants{
-    public static final int HoodMotorID = 3;
-    public static final int TowerMotorID = 46;
+    public static final int HoodMotorID = 46;
+    public static final int TowerMotorID = 3;
     public static final int ShooterMotorID = 6;
+    public static final int ShooterMotor2ID = 7;
     public static int desiredRPS = -110;
     public static double KS = 0.05;
     public static double KV = 0.12;
