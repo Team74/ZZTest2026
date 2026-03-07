@@ -90,7 +90,7 @@ public class SwerveSubsystem extends SubsystemBase
    * PhotonVision class to keep an accurate odometry.
    */
   // private       Vision      vision;
-  Pigeon2 gyro = new Pigeon2(Constants.DrivebaseConstants.GyroID);
+  //Pigeon2 gyro = new Pigeon2(Constants.DrivebaseConstants.GyroID);
   private Field2d m_field = new Field2d();
   Limelight               limelight;  
     LimelightPoseEstimator  limelightPoseEstimator;
