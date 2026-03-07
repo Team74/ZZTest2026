@@ -136,7 +136,7 @@ public class SwerveSubsystem extends SubsystemBase
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
 
-    setupLimelight();
+    //setupLimelight();
   }
 
   public void setupLimelight() {
@@ -191,7 +191,7 @@ public class SwerveSubsystem extends SubsystemBase
     if (visionDriveTest)
     {
       // swerveDrive.updateOdometry();
-      UpdatePoseEstimation_LL();
+      //UpdatePoseEstimation_LL();
     }
   }
 
