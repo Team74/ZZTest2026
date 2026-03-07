@@ -36,7 +36,7 @@ public class IntakeSubsystem extends SubsystemBase{
   double intakeMoverSpeedConstant = Constants.IntakeConstants.IntakeMoverSpeed;
   double intakeMoverSpeed;
 
-  double intakeSpeed = 0.5;
+  double intakeSpeed = 0.7;
 
   boolean topLimitSwitchTriggered = false;
   boolean botLimitSwitchTriggered = false;

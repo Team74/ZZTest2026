@@ -80,14 +80,15 @@ public class Turret_Shoot extends SubsystemBase {
 
   public Command shoot(){
     return run(()->{
-        currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
+        currentRPS_Shooter = shooterMotor2.getVelocity().getValueAsDouble();
+        System.out.println(currentRPS_Shooter);
         
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
       shooterMotor2.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
-      //if (currentRPS_Shooter <= (Constants.ShooterConstants.desiredRPS * 0.75)) {
+      if (currentRPS_Shooter <= (Constants.ShooterConstants.desiredRPS * 0.75)) {
         towerMotor.set(-Constants.ShooterConstants.desiredRPS);
-      //}
+      }
      
     });
   } 
@@ -113,7 +114,7 @@ public class Turret_Shoot extends SubsystemBase {
       currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
         
       var request = new VelocityVoltage(0).withSlot(0);
-      shooterMotor.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
+      shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
       shooterMotor2.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
 
       if (currentRPS_Shooter >= (Constants.ShooterConstants.desiredRPS * -0.75)) {

@@ -214,9 +214,9 @@ void LEDs() {
 
   void TurretSubsystem() {
     //shooter flywheels
-    operatorXbox.leftTrigger().and(operatorXbox.b().negate()).onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
+    operatorXbox.rightTrigger().and(operatorXbox.b().negate()).onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
     // reverse
-    operatorXbox.leftTrigger().and(operatorXbox.b()).onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
+    //operatorXbox.rightTrigger().and(operatorXbox.b()).onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
 
     //moves hood 
     operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHoodOut()).whileFalse(hoodSubsystem.StopHood());
@@ -240,10 +240,8 @@ void LEDs() {
   
   void ClimberSubsystem() {
     // up on the D-Pad goes up
-    operatorXbox.povUp().whileTrue(Climber.ClimbUp());
+    operatorXbox.povUp().onTrue(Climber.ClimbUp()).whileFalse(Climber.ClimbStop());
     // down on the D-Pad goes down
-    operatorXbox.povDown().whileTrue(Climber.ClimbDown());
-    // neither being pressed stops the motor
-    operatorXbox.povUp().and(operatorXbox.povDown()).whileFalse(Climber.ClimbStop());
+    operatorXbox.povDown().onTrue(Climber.ClimbDown()).whileFalse(Climber.ClimbStop());
   }
 }
