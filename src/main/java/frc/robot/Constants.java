@@ -46,7 +46,7 @@ public final class Constants
   {    
     public static final int MoverMotorID = 34;
     public static final int FeederMotorID = 33;
-    
+    public static final double IntakeMoverSpeed = 0.5;
   }
 
   public static class OperatorConstants
@@ -73,5 +73,10 @@ public final class Constants
     public static boolean SupplyCurrentLimitEnable = true;
     public static int StatorCurrentLimit = 40;
     public static boolean StatorCurrentLimitEnable = true;
+  }
+
+  public static class ClimberConstants{
+    public static final int ClimbMotorID = 30;
+    public static final double ClimbSpeed = .2;
   }
 }

@@ -33,7 +33,7 @@ public class IntakeSubsystem extends SubsystemBase{
   DigitalInput m_toplimitswitch = new DigitalInput(0);
   DigitalInput m_bottomlimitswitch = new DigitalInput(1);
 
-  double intakeMoverSpeedConstant = 0.5;
+  double intakeMoverSpeedConstant = Constants.IntakeConstants.IntakeMoverSpeed;
   double intakeMoverSpeed;
 
   double intakeSpeed = 0.5;
@@ -45,10 +45,13 @@ public class IntakeSubsystem extends SubsystemBase{
   boolean isIntakeOut;
   boolean isTopPressed;
   boolean isBottomPressed;
+  boolean isMovingOut;
+
   public IntakeSubsystem(){     
     intakeMax = new SparkMax(Constants.IntakeConstants.FeederMotorID, MotorType.kBrushless);
     intakeMoverMax = new SparkMax(Constants.IntakeConstants.MoverMotorID, MotorType.kBrushless);
     isIntakeOut = false;
+    isMovingOut = false;
   }
 
   public Command intakeIn(){
@@ -71,7 +74,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
 
   public Command Swap(){
-      /**
+      /*
        * Run only once when the A button is down.
        * 
        * Swaps the direction the intake mechanism is moving.
@@ -82,7 +85,11 @@ public class IntakeSubsystem extends SubsystemBase{
       isBottomPressed = m_bottomlimitswitch.get();
        
       if (isBottomPressed && isIntakeOut){
+        isMovingOut = false;
+      }
 
+      if (isTopPressed && !isIntakeOut){
+        isMovingOut = true;
       }
              
 
@@ -99,22 +106,26 @@ public class IntakeSubsystem extends SubsystemBase{
     });
   }
   public Command MoveIntake(){
-    
+    /* 
+     * Always running
+     * Moves the intake
+     * and stops it with limits
+     */
     return run(()->{
       
-            if (isIntakeOut == false){
+            if (isMovingOut){
               intakeMoverSpeed = -intakeMoverSpeedConstant;
             }
       
-            if (isIntakeOut == true){
+            if (!isMovingOut){
               intakeMoverSpeed = intakeMoverSpeedConstant;
             }
       
             if (isTopPressed){
-              intakeMoverSpeed = MathUtil.clamp(intakeMoverSpeed,0,0);
+              intakeMoverSpeed = MathUtil.clamp(intakeMoverSpeed,-1,0);
             }
             if (isBottomPressed){
-              intakeMoverSpeed = MathUtil.clamp(intakeMoverSpeed,0,0);
+              intakeMoverSpeed = MathUtil.clamp(intakeMoverSpeed,0,1);
             }
       
             intakeMoverMax.set(intakeMoverSpeed);
