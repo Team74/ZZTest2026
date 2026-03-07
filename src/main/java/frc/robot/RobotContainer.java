@@ -220,6 +220,10 @@ void LEDs() {
     operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHoodOut()).whileFalse(hoodSubsystem.StopHood());
     // reverse
     operatorXbox.rightBumper().onTrue(hoodSubsystem.MoveHoodIn()).whileFalse(hoodSubsystem.StopHood());
+    
+    //test elevator code DELETE AFTER OR CHANGE
+    //operatorXbox.y().onTrue(shootSubsystem.testElevatorUp()).onFalse(shootSubsystem.testElevatorStop());
+    //operatorXbox.x().onTrue(shootSubsystem.testElevatorDown()).onFalse(shootSubsystem.testElevatorStop());
   }
 
   void IntakeSubsystem() {
