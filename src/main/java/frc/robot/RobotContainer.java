@@ -55,7 +55,7 @@ public class RobotContainer
   private final Turret_Shoot shootSubsystem = new Turret_Shoot();
   private final Turret_Hood hoodSubsystem = new Turret_Hood();
   private final IntakeSubsystem intake = new IntakeSubsystem();
-  private final LEDs led = new LEDs();
+ // private final LEDs led = new LEDs();
   private final ClimberSubsystem Climber = new ClimberSubsystem();
   
  
@@ -209,7 +209,7 @@ public class RobotContainer
     drivebase.setMotorBrake(brake);
   }
 void LEDs() {
-  led.ColorChange(led.HubTimer()).repeatedly();
+  //led.ColorChange(led.HubTimer()).repeatedly();
 }
 
   void TurretSubsystem() {

@@ -19,6 +19,8 @@ public class Turret_Hood extends SubsystemBase {
     //XboxController controller = new XboxController(1);
     double hoodSpeed = 0.25;
    
+    DigitalInput magSwitch = new DigitalInput(2);
+
     public Command MoveHoodIn(){
         return run(()->{
             hood.set(-hoodSpeed);
@@ -28,12 +30,17 @@ public class Turret_Hood extends SubsystemBase {
     public Command MoveHoodOut(){
         return run(()->{
             hood.set(hoodSpeed);
+            if (magSwitch.get() == false){
+                hood.set(0);
+                System.out.println("SWITCHED");
+            }
         });
     }
 
     public Command StopHood(){
         return run(()->{
             hood.set(0);
+
         });
     }
 }
