@@ -29,6 +29,7 @@ import limelight.Limelight;
 public class IntakeSubsystem extends SubsystemBase{
   SparkMax intakeMax;
   SparkMax intakeMoverMax;
+  SparkMax HotdogmotorID;
 
   DigitalInput m_toplimitswitch = new DigitalInput(0);
   DigitalInput m_bottomlimitswitch = new DigitalInput(1);
@@ -50,6 +51,7 @@ public class IntakeSubsystem extends SubsystemBase{
   public IntakeSubsystem(){     
     intakeMax = new SparkMax(Constants.IntakeConstants.FeederMotorID, MotorType.kBrushless);
     intakeMoverMax = new SparkMax(Constants.IntakeConstants.MoverMotorID, MotorType.kBrushless);
+    HotdogmotorID = new SparkMax(Constants.IntakeConstants.HotdogmotorID,MotorType.kBrushless);
     isIntakeOut = false;
     isMovingOut = false;
   }
