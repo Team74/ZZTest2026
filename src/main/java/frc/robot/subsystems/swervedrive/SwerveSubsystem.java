@@ -147,10 +147,10 @@ public class SwerveSubsystem extends SubsystemBase
         .withPipelineIndex(0)
         .withCameraOffset(
             new Pose3d(
-                Units.inchesToMeters(12),
-                Units.inchesToMeters(12),
-                Units.inchesToMeters(10.5),
-                new Rotation3d(0, 0, Units.degreesToRadians(45))))
+                Units.inchesToMeters(12.5),
+                Units.inchesToMeters(0),
+                Units.inchesToMeters(8.5),
+                new Rotation3d(0, Units.degreesToRadians(45), 0)))
         //.withAprilTagIdFilter(List.of(17, 18, 19, 20, 21, 22, 6, 7, 8, 9, 10, 11))
         .save();
     limelightPoseEstimator = limelight.createPoseEstimator(EstimationMode.MEGATAG1);
@@ -199,29 +199,56 @@ public class SwerveSubsystem extends SubsystemBase
   private boolean initialReading = false;
 
   public void UpdatePoseEstimation_LL() {
-
-    limelight
-        .getSettings()
-        .withRobotOrientation(
-            new Orientation3d(
-                new Rotation3d(swerveDrive.getOdometryHeading().rotateBy(Rotation2d.kZero)),
-                new AngularVelocity3d(
-                    DegreesPerSecond.of(0), DegreesPerSecond.of(0), DegreesPerSecond.of(0))))
-        .save();
-
-    Optional<PoseEstimate> visionEstimate = limelightPoseEstimator.getPoseEstimate(); // BotPose.BLUE_MEGATAG2.get(limelight);
-      visionEstimate.ifPresent((PoseEstimate poseEstimate) -> {
-      // If the average tag distance is less than 4 meters,
-      // there are more than 0 tags in view,
-      // and the average ambiguity between tags is less than 30% then we update the pose estimation.
-      if (poseEstimate.avgTagDist < 4 && poseEstimate.tagCount > 0 && poseEstimate.getMinTagAmbiguity() < 0.3)
+ // This method will be called once per scheduler run
+      limelight.getSettings()
+               .withRobotOrientation(new Orientation3d(new Rotation3d(swerveDrive.getOdometryHeading()
+                                                                                 .rotateBy(Rotation2d.kZero)),
+                                                       new AngularVelocity3d(DegreesPerSecond.of(0),
+                                                                             DegreesPerSecond.of(0),
+                                                                             DegreesPerSecond.of(0))))
+               .save();
+      Optional<PoseEstimate>     poseEstimates = limelightPoseEstimator.getPoseEstimate();
+      Optional<LimelightResults> results       = limelight.getLatestResults();
+      if (results.isPresent()/* && poseEstimates.isPresent()*/)
       {
-        swerveDrive.addVisionMeasurement(poseEstimate.pose.toPose2d(),
-                                                            poseEstimate.timestampSeconds);
+        LimelightResults result       = results.get();
+        PoseEstimate     poseEstimate = poseEstimates.get();
+        SmartDashboard.putNumber("Avg Tag Ambiguity", poseEstimate.getAvgTagAmbiguity());
+        SmartDashboard.putNumber("Min Tag Ambiguity", poseEstimate.getMinTagAmbiguity());
+        SmartDashboard.putNumber("Max Tag Ambiguity", poseEstimate.getMaxTagAmbiguity());
+        SmartDashboard.putNumber("Avg Distance", poseEstimate.avgTagDist);
+        SmartDashboard.putNumber("Avg Tag Area", poseEstimate.avgTagArea);
+        SmartDashboard.putNumber("Odom Pose/x", swerveDrive.getPose().getX());
+        SmartDashboard.putNumber("Odom Pose/y", swerveDrive.getPose().getY());
+        SmartDashboard.putNumber("Odom Pose/degrees", swerveDrive.getPose().getRotation().getDegrees());
+        SmartDashboard.putNumber("Limelight Pose/x", poseEstimate.pose.getX());
+        SmartDashboard.putNumber("Limelight Pose/y", poseEstimate.pose.getY());
+        SmartDashboard.putNumber("Limelight Pose/degrees", poseEstimate.pose.toPose2d().getRotation().getDegrees());
+        if (result.valid)
+        {
+          // Pose2d estimatorPose = poseEstimate.pose.toPose2d();
+          Pose2d usefulPose     = result.getBotPose2d(Alliance.Blue);
+          double distanceToPose = usefulPose.getTranslation().getDistance(swerveDrive.getPose().getTranslation());
+          if (distanceToPose < 0.5 || (outofAreaReading > 10) || (outofAreaReading > 10 && !initialReading))
+          {
+            if (!initialReading)
+            {
+              initialReading = true;
+            }
+            outofAreaReading = 0;
+            // System.out.println(usefulPose.toString());
+            swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(0.05, 0.05, 0.022));
+            // System.out.println(result.timestamp_LIMELIGHT_publish);
+            // System.out.println(result.timestamp_RIOFPGA_capture);
+            swerveDrive.addVisionMeasurement(usefulPose, result.timestamp_RIOFPGA_capture);
+          } else
+          {
+            outofAreaReading += 1;
+          }
+  //        swerveDrive.addVisionMeasurement(estimatorPose, poseEstimate.timestampSeconds);
+        }
+  
       }
-    });
-
-    // }
   }
 
   @Override
