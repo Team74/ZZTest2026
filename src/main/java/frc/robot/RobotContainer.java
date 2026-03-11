@@ -110,6 +110,7 @@ public class RobotContainer
 
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("shoot", shootSubsystem.shoot());
     autoChooser = AutoBuilder.buildAutoChooser();
 
     //Put the autoChooser on the SmartDashboard
