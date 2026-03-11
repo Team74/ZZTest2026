@@ -20,15 +20,19 @@ public class ClimberSubsystem extends SubsystemBase{
     public Command ClimbUp(){
         return run(()->{
           climbMax.set(climbSpeed);
+          System.out.println("Hi" + climbSpeed);
         });
     } 
     public Command ClimbDown(){
         return run(()->{
           climbMax.set(-climbSpeed);
+          System.out.println("down" + climbSpeed);
         });
     } 
     public Command ClimbStop(){
         return run(()->{
+                    System.out.println("stop" + climbSpeed);
+
           climbMax.set(0);
         });
     } 
