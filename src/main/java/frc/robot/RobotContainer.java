@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -24,10 +25,14 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Hood;
 import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Shoot;
+import frc.robot.subsystems.swervedrive.LEDs;
 
 
 import java.io.File;
+import java.util.function.BooleanSupplier;
+
 import swervelib.SwerveInputStream;
+import frc.robot.subsystems.swervedrive.ClimberSubsystem;
 import frc.robot.subsystems.swervedrive.IntakeSubsystem;
 
 /**
@@ -50,6 +55,8 @@ public class RobotContainer
   private final Turret_Shoot shootSubsystem = new Turret_Shoot();
   private final Turret_Hood hoodSubsystem = new Turret_Hood();
   private final IntakeSubsystem intake = new IntakeSubsystem();
+ // private final LEDs led = new LEDs();
+  private final ClimberSubsystem Climber = new ClimberSubsystem();
   
  
 
@@ -85,6 +92,13 @@ public class RobotContainer
                                                                     .deadband(OperatorConstants.DEADBAND)
                                                                     .scaleTranslation(0.8)
                                                                     .allianceRelativeControl(true);
+                                                                      // Derive the heading axis with math!
+                                                                    SwerveInputStream driveDirectAngleKeyboard     = driveAngularVelocityKeyboard.copy()
+                                                                    .withControllerHeadingAxis(() -> Math.sin(driverXbox.getRawAxis(2) * Math.PI) * (Math.PI * 2),
+                                                                    () -> Math.cos(driverXbox.getRawAxis(2) * Math.PI) * (Math.PI * 2))
+                                                                    .headingWhile(true)
+                                                                    .translationHeadingOffset(true)
+                                                                    .translationHeadingOffset(Rotation2d.fromDegrees(0));
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -96,6 +110,7 @@ public class RobotContainer
 
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("shoot", shootSubsystem.shoot());
     autoChooser = AutoBuilder.buildAutoChooser();
 
     //Put the autoChooser on the SmartDashboard
@@ -119,11 +134,49 @@ public class RobotContainer
 
     
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    
+    }
+    TurretSubsystem();
     IntakeSubsystem();
+    ClimberSubsystem();
+    LEDs();
+    
+  /*  commented out for now because 
+  if (Robot.isSimulation())
+    {
+      Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
 
-    
-    
+      //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
+
+      driveDirectAngleKeyboard.driveToPose(() -> target,
+      new ProfiledPIDController(5,0,0, new Constraints(5, 2)),
+      new ProfiledPIDController(5,0,0,
+      new Constraints(Units.degreesToRadians(360),
+      Units.degreesToRadians(180))));
+
+      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+      driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+      driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true), () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
+
+
+//      driverXbox.b().whileTrue(
+//          drivebase.driveToPose(
+//              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+//                              );
+
+    }
+    */
+    if (DriverStation.isTest())
+    {
+      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+
+      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
+      driverXbox.leftBumper().onTrue(Commands.none());
+      driverXbox.rightBumper().onTrue(Commands.none());
+    } else
+    {
       System.out.println("ZeroReset1111");
       
       driverXbox.y().onTrue((Commands.runOnce(drivebase::zeroGyro)));
@@ -151,31 +204,40 @@ public class RobotContainer
   {
     drivebase.setMotorBrake(brake);
   }
+void LEDs() {
+  //led.ColorChange(led.HubTimer()).repeatedly();
+}
 
-
-  void IntakeSubsystem() {
-    Trigger B_Button = operatorXbox.b();
-    Trigger L_trigger = operatorXbox.leftTrigger();
-    Trigger R_Trigger = operatorXbox.rightTrigger();
-
-    Trigger IntakeReverseButton = B_Button.and(L_trigger);
-    Trigger ShooterReverseButton = B_Button.and(R_Trigger);
-    //flips intake in or out
-    // operatorXbox.a().onTrue(intake.Swap());
-    operatorXbox.a().whileTrue(intake.Swap());
-
-    //driverXbox.a().toggleOnTrue(intake.Swap()).whileFalse(intake.Moveintake());
-    
-    //spins intake flywheels 
- //   operatorXbox.leftTrigger().onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
-   // IntakeReverseButton.onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
+  void TurretSubsystem() {
+    //shooter flywheels
+    operatorXbox.rightTrigger().and(operatorXbox.b().negate()).onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
+    // reverse
+    //operatorXbox.rightTrigger().and(operatorXbox.b()).onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
 
     //moves hood 
     operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHoodOut()).whileFalse(hoodSubsystem.StopHood());
+    // reverse
     operatorXbox.rightBumper().onTrue(hoodSubsystem.MoveHoodIn()).whileFalse(hoodSubsystem.StopHood());
+    
+    //test elevator code DELETE AFTER OR CHANGE
+    //operatorXbox.y().onTrue(shootSubsystem.testElevatorUp()).onFalse(shootSubsystem.testElevatorStop());
+    //operatorXbox.x().onTrue(shootSubsystem.testElevatorDown()).onFalse(shootSubsystem.testElevatorStop());
+  }
 
-    //shooter flywheels
-    operatorXbox.rightTrigger().onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
-    ShooterReverseButton.onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
+  void IntakeSubsystem() {
+    //flips intake in or out
+    operatorXbox.a().onTrue(intake.Swap());
+    intake.MoveIntake().repeatedly();
+    //spins intake flywheels 
+    operatorXbox.leftTrigger().and(operatorXbox.b().negate()).onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
+    //reverse
+    operatorXbox.leftTrigger().and(operatorXbox.b()).onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
+  }
+  
+  void ClimberSubsystem() {
+    // up on the D-Pad goes up
+    operatorXbox.povUp().onTrue(Climber.ClimbUp()).whileFalse(Climber.ClimbStop());
+    // down on the D-Pad goes down
+    operatorXbox.povDown().onTrue(Climber.ClimbDown()).whileFalse(Climber.ClimbStop());
   }
 }

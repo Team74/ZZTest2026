@@ -44,9 +44,10 @@ public final class Constants
 
   public static class IntakeConstants
   {    
+    public static final int HotdogmotorID = 31;
     public static final int MoverMotorID = 34;
     public static final int FeederMotorID = 33;
-    
+    public static final double IntakeMoverSpeed = 0.5;
   }
 
   public static class OperatorConstants
@@ -59,10 +60,11 @@ public final class Constants
   }
 
   public static class ShooterConstants{
-    public static final int HoodMotorID = 3;
-    public static final int TowerMotorID = 46;
+    public static final int HoodMotorID = 46;
+    public static final int TowerMotorID = 3;
     public static final int ShooterMotorID = 6;
-    public static int desiredRPS = -110;
+    public static final int ShooterMotor2ID = 7;
+    public static int desiredRPS = -90;
     public static double KS = 0.05;
     public static double KV = 0.12;
     public static double KP = 0.11;
@@ -72,5 +74,10 @@ public final class Constants
     public static boolean SupplyCurrentLimitEnable = true;
     public static int StatorCurrentLimit = 40;
     public static boolean StatorCurrentLimitEnable = true;
+  }
+
+  public static class ClimberConstants{
+    public static final int ClimbMotorID = 30;
+    public static final double ClimbSpeed = .2;
   }
 }
