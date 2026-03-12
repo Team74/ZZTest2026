@@ -42,7 +42,7 @@ public class ClimberSubsystem extends SubsystemBase{
     } 
     public Command ClimbStop(){
         return run(()->{
-                    System.out.println("stop" + climbSpeed);
+                    //System.out.println("stop" + climbSpeed);
 
           climbMax.set(0);
         });

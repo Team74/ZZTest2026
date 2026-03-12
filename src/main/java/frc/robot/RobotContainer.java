@@ -143,7 +143,7 @@ public class RobotContainer
       intake.setDefaultCommand(intake.intakeStop());
       intake.setDefaultCommand(intake.stopHotDog());
       Climber.setDefaultCommand(Climber.ClimbStop());
-      intake2.setDefaultCommand(intake2.Stop());
+      intake2.setDefaultCommand(intake2.MoveToDesiredState());
 
       testControls();
     } 
@@ -246,7 +246,7 @@ void LEDs() {
     //Intake Flipper Motor
     operatorXbox.x()
       .onTrue(intake2.SwapDesiredState())
-      .onFalse(intake2.Stop());
+      .onFalse(intake2.MoveToDesiredState());
 
     //Climber Motor
     operatorXbox.a()

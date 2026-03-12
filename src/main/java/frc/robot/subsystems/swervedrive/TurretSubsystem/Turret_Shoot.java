@@ -105,6 +105,7 @@ public class Turret_Shoot extends SubsystemBase {
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(desiredSpeed).withFeedForward(0.5));
       shooterMotor2.setControl(request.withVelocity(-desiredSpeed).withFeedForward(0.5));
+      System.out.println("shoot" + desiredSpeed);
     });
   } 
 
@@ -155,7 +156,7 @@ public class Turret_Shoot extends SubsystemBase {
       if(reverse){
         desiredSpeed = -desiredSpeed;
       }
-      towerMotor.set(-desiredSpeed);    
+      towerMotor.set(desiredSpeed);    
     });
   } 
 }
