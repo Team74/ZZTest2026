@@ -41,10 +41,8 @@ public class IntakeFlipperSubsystem extends SubsystemBase{
   eCurrentState currentState = eCurrentState.IN_STOPPED; 
   eDesiredEndState currentDesiredState = eDesiredEndState.IN; 
 
-  SparkMax intakeMax = new SparkMax(Constants.IntakeConstants.FeederMotorID, MotorType.kBrushless);
   SparkMax intakeMoverMax = new SparkMax(Constants.IntakeConstants.MoverMotorID, MotorType.kBrushless);
-  SparkMax HotdogmotorID = new SparkMax(Constants.IntakeConstants.HotdogmotorID,MotorType.kBrushless);
-
+ 
   DigitalInput m_toplimitswitch = new DigitalInput(0);
   DigitalInput m_bottomlimitswitch = new DigitalInput(1);
 

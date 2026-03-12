@@ -31,8 +31,8 @@ public class IntakeSubsystem extends SubsystemBase{
   SparkMax intakeMoverMax;
   SparkMax HotdogmotorID;
 
-  DigitalInput m_toplimitswitch = new DigitalInput(0);
-  DigitalInput m_bottomlimitswitch = new DigitalInput(1);
+  DigitalInput m_toplimitswitch = new DigitalInput(4);
+  DigitalInput m_bottomlimitswitch = new DigitalInput(5);
 
   double intakeMoverSpeedConstant = Constants.IntakeConstants.IntakeMoverSpeed;
   double intakeMoverSpeed;
@@ -50,7 +50,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
   public IntakeSubsystem(){     
     intakeMax = new SparkMax(Constants.IntakeConstants.FeederMotorID, MotorType.kBrushless);
-    intakeMoverMax = new SparkMax(Constants.IntakeConstants.MoverMotorID, MotorType.kBrushless);
+    //intakeMoverMax = new SparkMax(Constants.IntakeConstants.MoverMotorID, MotorType.kBrushless);
     HotdogmotorID = new SparkMax(Constants.IntakeConstants.HotdogmotorID,MotorType.kBrushless);
     isIntakeOut = false;
     isMovingOut = false;
