@@ -16,6 +16,17 @@ public class ClimberSubsystem extends SubsystemBase{
         climbMax = new SparkMax(Constants.ClimberConstants.ClimbMotorID, MotorType.kBrushless);
         climbSpeed = Constants.ClimberConstants.ClimbSpeed;
     }
+        
+    public Command Climb(boolean reverse){
+      return run(()->{
+        double desiredSpeed = climbSpeed;
+        if(reverse){
+            desiredSpeed = -desiredSpeed;
+        }
+        climbMax.set(desiredSpeed);
+      });
+    } 
+
 
     public Command ClimbUp(){
         return run(()->{

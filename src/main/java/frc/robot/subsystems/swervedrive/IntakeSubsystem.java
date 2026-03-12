@@ -56,6 +56,16 @@ public class IntakeSubsystem extends SubsystemBase{
     isMovingOut = false;
   }
 
+  public Command moveIntake(boolean reverse){
+    return run(()->{
+      double desiredSpeed = intakeSpeed;
+      if(reverse){
+          desiredSpeed = -desiredSpeed;
+      }
+      intakeMax.set(desiredSpeed);
+    });
+  } 
+
   public Command intakeIn(){
     return run(()->{
       intakeMax.set(intakeSpeed);
@@ -139,4 +149,21 @@ public class IntakeSubsystem extends SubsystemBase{
     
       });
     }
+
+  public Command moveHotDog(boolean reverse){
+    return run(()->{
+      double desiredSpeed = 1;
+      if(reverse){
+        desiredSpeed = -desiredSpeed;
+      }
+      
+      HotdogmotorID.set(desiredSpeed);
+    });
+  } 
+
+  public Command stopHotDog(){
+    return run(()->{
+      HotdogmotorID.set(0);
+    });
+  } 
 }

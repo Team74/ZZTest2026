@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Hood;
 import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Shoot;
@@ -33,6 +34,7 @@ import java.util.function.BooleanSupplier;
 
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.swervedrive.ClimberSubsystem;
+import frc.robot.subsystems.swervedrive.IntakeFlipperSubsystem;
 import frc.robot.subsystems.swervedrive.IntakeSubsystem;
 
 /**
@@ -55,6 +57,7 @@ public class RobotContainer
   private final Turret_Shoot shootSubsystem = new Turret_Shoot();
   private final Turret_Hood hoodSubsystem = new Turret_Hood();
   private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final IntakeFlipperSubsystem intake2 = new IntakeFlipperSubsystem();
  // private final LEDs led = new LEDs();
   private final ClimberSubsystem Climber = new ClimberSubsystem();
   
@@ -110,7 +113,7 @@ public class RobotContainer
 
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-    NamedCommands.registerCommand("shoot", shootSubsystem.shoot());
+    NamedCommands.registerCommand("shoot", shootSubsystem.shoot(false));
     autoChooser = AutoBuilder.buildAutoChooser();
 
     //Put the autoChooser on the SmartDashboard
@@ -132,51 +135,24 @@ public class RobotContainer
     Command driveRobotOrientedAngularVelocity  = drivebase.driveFieldOriented(driveRobotOriented);
     Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
 
-    
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    
-    TurretSubsystem();
-    IntakeSubsystem();
-    ClimberSubsystem();
-    LEDs();
-    
-  /*  commented out for now because 
-  if (Robot.isSimulation())
-    {
-      Pose2d target = new Pose2d(new Translation2d(1, 4), Rotation2d.fromDegrees(90));
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
-      //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
+    if (DriverStation.isTest()) {
+      shootSubsystem.setDefaultCommand(shootSubsystem.stopShooter());
+      hoodSubsystem.setDefaultCommand(hoodSubsystem.StopHood());
+      intake.setDefaultCommand(intake.intakeStop());
+      intake.setDefaultCommand(intake.stopHotDog());
+      Climber.setDefaultCommand(Climber.ClimbStop());
+      intake2.setDefaultCommand(intake2.Stop());
 
-      driveDirectAngleKeyboard.driveToPose(() -> target,
-      new ProfiledPIDController(5,0,0, new Constraints(5, 2)),
-      new ProfiledPIDController(5,0,0,
-      new Constraints(Units.degreesToRadians(360),
-      Units.degreesToRadians(180))));
+      testControls();
+    } 
+    else {
+      TurretSubsystem();
+      IntakeSubsystem();
+      ClimberSubsystem();
+      LEDs();
 
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-      driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true), () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
-
-
-//      driverXbox.b().whileTrue(
-//          drivebase.driveToPose(
-//              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-//                              );
-
-    }
-    */
-    if (DriverStation.isTest())
-    {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
-
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
-    } else
-    {
       System.out.println("ZeroReset1111");
       
       driverXbox.y().onTrue((Commands.runOnce(drivebase::zeroGyro)));
@@ -210,7 +186,7 @@ void LEDs() {
 
   void TurretSubsystem() {
     //shooter flywheels
-    operatorXbox.rightTrigger().and(operatorXbox.b().negate()).onTrue(shootSubsystem.shoot()).whileFalse(shootSubsystem.stopShooter());
+    operatorXbox.rightTrigger().and(operatorXbox.b().negate()).onTrue(shootSubsystem.shoot(false)).whileFalse(shootSubsystem.stopShooter());
     // reverse
     //operatorXbox.rightTrigger().and(operatorXbox.b()).onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
 
@@ -240,4 +216,28 @@ void LEDs() {
     // down on the D-Pad goes down
     operatorXbox.povDown().onTrue(Climber.ClimbDown()).whileFalse(Climber.ClimbStop());
   }
+
+  void testControls() {
+    //Shooter Motors
+    operatorXbox.rightTrigger().onTrue(shootSubsystem.testShoot(operatorXbox.b().getAsBoolean()));
+    
+    //Tower Motor
+    operatorXbox.leftTrigger().onTrue(shootSubsystem.testTower(operatorXbox.b().getAsBoolean()));
+
+    //Hot dog Motor
+    operatorXbox.rightBumper().onTrue(intake.moveHotDog(operatorXbox.b().getAsBoolean()));
+
+    //Hood Motor
+    operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHood(operatorXbox.b().getAsBoolean()));
+
+    //Intake Roller Motor
+    operatorXbox.y().onTrue(intake.moveIntake(operatorXbox.b().getAsBoolean()));
+
+    //Intake Flipper Motor
+    operatorXbox.x().onTrue(intake2.SwapDesiredState());
+
+    //Climber Motor
+    operatorXbox.a().onTrue(Climber.Climb(operatorXbox.b().getAsBoolean()));
+  }
+
 }

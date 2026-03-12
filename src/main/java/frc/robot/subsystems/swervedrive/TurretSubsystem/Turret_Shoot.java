@@ -8,7 +8,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -78,7 +80,7 @@ public class Turret_Shoot extends SubsystemBase {
     shooterMotor2.setNeutralMode(NeutralModeValue.Brake);
   }
 
-  public Command shoot(){
+  public Command shoot(boolean reverse){
     return run(()->{
         currentRPS_Shooter = shooterMotor2.getVelocity().getValueAsDouble();
         System.out.println(currentRPS_Shooter);
@@ -92,6 +94,20 @@ public class Turret_Shoot extends SubsystemBase {
      
     });
   } 
+
+  public Command testShoot(boolean reverse){
+    return run(()->{
+      var desiredSpeed = Constants.ShooterConstants.desiredRPS;
+      if(reverse){
+        desiredSpeed = -desiredSpeed;
+      }
+
+      var request = new VelocityVoltage(0).withSlot(0);
+      shooterMotor.setControl(request.withVelocity(desiredSpeed).withFeedForward(0.5));
+      shooterMotor2.setControl(request.withVelocity(-desiredSpeed).withFeedForward(0.5));
+    });
+  } 
+
   public Command testElevatorUp(){
     return run(()->{
       towerMotor.set(-0.5);
@@ -130,6 +146,16 @@ public class Turret_Shoot extends SubsystemBase {
       shooterMotor.setControl(request.withVelocity(0));
       shooterMotor2.setControl(request.withVelocity(0));     
       towerMotor.set(0);
+    });
+  } 
+
+  public Command testTower(boolean reverse){
+    return run(()->{
+      var desiredSpeed = Constants.ShooterConstants.desiredRPS;
+      if(reverse){
+        desiredSpeed = -desiredSpeed;
+      }
+      towerMotor.set(-desiredSpeed);    
     });
   } 
 }

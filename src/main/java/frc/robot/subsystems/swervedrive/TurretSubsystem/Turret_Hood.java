@@ -43,4 +43,15 @@ public class Turret_Hood extends SubsystemBase {
 
         });
     }
+
+    public Command MoveHood(boolean reverse){
+        return run(()->{
+            double desiredSpeed = -hoodSpeed;
+            if(reverse){
+                desiredSpeed = -desiredSpeed;
+            }
+            hood.set(desiredSpeed);
+        });
+    }
+
 }
