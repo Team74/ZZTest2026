@@ -63,6 +63,8 @@ public class IntakeSubsystem extends SubsystemBase{
           desiredSpeed = -desiredSpeed;
       }
       intakeMax.set(desiredSpeed);
+
+      System.out.println("moveIntake: " + desiredSpeed);
     });
   } 
 

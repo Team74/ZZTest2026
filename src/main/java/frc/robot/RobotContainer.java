@@ -219,25 +219,39 @@ void LEDs() {
 
   void testControls() {
     //Shooter Motors
-    operatorXbox.rightTrigger().onTrue(shootSubsystem.testShoot(operatorXbox.b().getAsBoolean()));
+    operatorXbox.rightTrigger()
+      .onTrue(shootSubsystem.testShoot(operatorXbox.b().getAsBoolean()))
+      .onFalse(shootSubsystem.stopShooter());
     
     //Tower Motor
-    operatorXbox.leftTrigger().onTrue(shootSubsystem.testTower(operatorXbox.b().getAsBoolean()));
+    operatorXbox.leftTrigger()
+      .onTrue(shootSubsystem.testTower(operatorXbox.b().getAsBoolean()))
+      .onFalse(shootSubsystem.stopShooter());
 
     //Hot dog Motor
-    operatorXbox.rightBumper().onTrue(intake.moveHotDog(operatorXbox.b().getAsBoolean()));
+    operatorXbox.rightBumper()
+      .onTrue(intake.moveHotDog(operatorXbox.b().getAsBoolean()))
+      .onFalse(intake.stopHotDog());
 
     //Hood Motor
-    operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHood(operatorXbox.b().getAsBoolean()));
+    operatorXbox.leftBumper()
+      .onTrue(hoodSubsystem.MoveHood(operatorXbox.b().getAsBoolean()))
+      .onFalse(hoodSubsystem.StopHood());
 
     //Intake Roller Motor
-    operatorXbox.y().onTrue(intake.moveIntake(operatorXbox.b().getAsBoolean()));
+    operatorXbox.y()
+      .onTrue(intake.moveIntake(operatorXbox.b().getAsBoolean()))
+      .onFalse(intake.intakeStop());
 
     //Intake Flipper Motor
-    operatorXbox.x().onTrue(intake2.SwapDesiredState());
+    operatorXbox.x()
+      .onTrue(intake2.SwapDesiredState())
+      .onFalse(intake2.Stop());
 
     //Climber Motor
-    operatorXbox.a().onTrue(Climber.Climb(operatorXbox.b().getAsBoolean()));
+    operatorXbox.a()
+      .onTrue(Climber.Climb(operatorXbox.b().getAsBoolean()))
+      .onFalse(Climber.ClimbStop());
   }
 
 }
