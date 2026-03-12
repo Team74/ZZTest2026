@@ -64,12 +64,16 @@ public class IntakeSubsystem extends SubsystemBase{
 
   public Command intakeOut(){
     return run(()->{
+                  HotdogmotorID.set(1);
+
       intakeMax.set(-intakeSpeed);
     });
   } 
 
   public Command intakeStop(){
     return run(()->{
+                  HotdogmotorID.set(0);
+
       intakeMax.set(0);
     });
   } 
