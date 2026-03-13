@@ -89,7 +89,7 @@ public class Turret_Shoot extends SubsystemBase {
       shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
       shooterMotor2.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
       if (currentRPS_Shooter <= (Constants.ShooterConstants.desiredRPS * 0.75)) {
-        towerMotor.set(-Constants.ShooterConstants.desiredRPS);
+        towerMotor.set(Constants.ShooterConstants.desiredRPS);
       }
      
     });

@@ -202,12 +202,16 @@ void LEDs() {
 
   void IntakeSubsystem() {
     //flips intake in or out
-    operatorXbox.a().onTrue(intake.Swap());
-    intake.MoveIntake().repeatedly();
+    // operatorXbox.a().onTrue(intake.Swap());
+    // intake.MoveIntake().repeatedly();
     //spins intake flywheels 
     operatorXbox.leftTrigger().and(operatorXbox.b().negate()).onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
     //reverse
     operatorXbox.leftTrigger().and(operatorXbox.b()).onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
+  
+   operatorXbox.a()
+      .onTrue(intake.moveHotDog(operatorXbox.b().getAsBoolean()))
+      .onFalse(intake.stopHotDog());
   }
   
   void ClimberSubsystem() {
