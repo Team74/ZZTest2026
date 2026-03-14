@@ -27,6 +27,7 @@ public class Turret_Hood extends SubsystemBase {
     AnalogPotentiometer stringPot = new AnalogPotentiometer(hoodPot);
     double hoodPosition;
     double hoodTarget;
+    double hoodPIDSpeed;
 
     public Command MoveHoodIn(){
         return run(()->{
@@ -60,12 +61,17 @@ public class Turret_Hood extends SubsystemBase {
             hood.set(desiredSpeed);
         });
     }
-
+    //automatically moves hood to correct position 
+    // when given a distance to the hub
     public Command HoodRanging (double Distance) {
         return run(()->{
             hoodPosition = stringPot.get();
-            hoodTarget = Distance*
-            HoodRangePID.calculate(hoodPosition, hoodTarget);
+            //TODO: find data for (Distance -> hoodPosition) conversion equation
+            //converts from distance to hood position
+            hoodTarget = (Distance*0.5);
+            // moves hood to correct position
+            hoodPIDSpeed = HoodRangePID.calculate(hoodPosition, hoodTarget);
+            hood.set(Distance);
 
         });
     }
