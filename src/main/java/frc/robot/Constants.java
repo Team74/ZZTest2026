@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -44,7 +45,7 @@ public final class Constants
 
   public static class IntakeConstants
   {    
-    public static final int HotdogmotorID = 31;
+    public static final int HotdogMotorID = 31;
     public static final int MoverMotorID = 34;
     public static final int FeederMotorID = 33;
     public static final double IntakeMoverSpeed = 0.5;
@@ -74,6 +75,7 @@ public final class Constants
     public static boolean SupplyCurrentLimitEnable = true;
     public static int StatorCurrentLimit = 40;
     public static boolean StatorCurrentLimitEnable = true;
+    public static PIDController HoodPID = new PIDController(0.05, 0, 0);
   }
 
   public static class ClimberConstants{

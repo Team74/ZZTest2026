@@ -30,8 +30,10 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 //import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -73,23 +75,30 @@ public class Turret_Shoot extends SubsystemBase {
 
   double hoodSpeed = 0.25;
 
+  Follower thign = new Follower(6, MotorAlignmentValue.Opposed);
+
   public Turret_Shoot() {
     shooterMotor.getConfigurator().apply(toConfigure);
     shooterMotor.setNeutralMode(NeutralModeValue.Brake);
     shooterMotor2.getConfigurator().apply(toConfigure);
     shooterMotor2.setNeutralMode(NeutralModeValue.Brake);
+    shooterMotor2.setControl(thign);
   }
 
   public Command shoot(boolean reverse){
     return run(()->{
-        currentRPS_Shooter = shooterMotor2.getVelocity().getValueAsDouble();
-        System.out.println(currentRPS_Shooter);
-        
+      currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
+      System.out.println(currentRPS_Shooter);
+
+      var desiredSpeed = Constants.ShooterConstants.desiredRPS;
+      if(reverse){
+        desiredSpeed = -desiredSpeed;
+      }        
+
       var request = new VelocityVoltage(0).withSlot(0);
-      shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
-      shooterMotor2.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
-      if (currentRPS_Shooter <= (Constants.ShooterConstants.desiredRPS * 0.75)) {
-        towerMotor.set(-Constants.ShooterConstants.desiredRPS);
+      shooterMotor.setControl(request.withVelocity(desiredSpeed).withFeedForward(0.5));
+      if (currentRPS_Shooter <= (desiredSpeed * 0.75) | reverse) {
+        towerMotor.set(-desiredSpeed);
       }
      
     });
@@ -104,7 +113,7 @@ public class Turret_Shoot extends SubsystemBase {
 
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(desiredSpeed).withFeedForward(0.5));
-      shooterMotor2.setControl(request.withVelocity(-desiredSpeed).withFeedForward(0.5));
+
     });
   } 
 
@@ -131,7 +140,7 @@ public class Turret_Shoot extends SubsystemBase {
         
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
-      shooterMotor2.setControl(request.withVelocity(-Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
+      shooterMotor2.setControl(thign);
 
       if (currentRPS_Shooter >= (Constants.ShooterConstants.desiredRPS * -0.75)) {
         towerMotor.set(Constants.ShooterConstants.desiredRPS);

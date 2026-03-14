@@ -5,7 +5,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.AnalogTrigger;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,9 +19,14 @@ import com.revrobotics.spark.config.LimitSwitchConfigAccessor;
 public class Turret_Hood extends SubsystemBase {
     SparkMax hood = new SparkMax(Constants.ShooterConstants.HoodMotorID,MotorType.kBrushless);
     //XboxController controller = new XboxController(1);
+    PIDController HoodRangePID = Constants.ShooterConstants.HoodPID;
     double hoodSpeed = 0.25;
    
     DigitalInput magSwitch = new DigitalInput(2);
+    AnalogInput hoodPot = new AnalogInput(0);
+    AnalogPotentiometer stringPot = new AnalogPotentiometer(hoodPot);
+    double hoodPosition;
+    double hoodTarget;
 
     public Command MoveHoodIn(){
         return run(()->{
@@ -51,6 +58,15 @@ public class Turret_Hood extends SubsystemBase {
                 desiredSpeed = -desiredSpeed;
             }
             hood.set(desiredSpeed);
+        });
+    }
+
+    public Command HoodRanging (double Distance) {
+        return run(()->{
+            hoodPosition = stringPot.get();
+            hoodTarget = Distance*
+            HoodRangePID.calculate(hoodPosition, hoodTarget);
+
         });
     }
 

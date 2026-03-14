@@ -29,7 +29,7 @@ import limelight.Limelight;
 public class IntakeSubsystem extends SubsystemBase{
   SparkMax intakeMax;
   SparkMax intakeMoverMax;
-  SparkMax HotdogmotorID;
+  SparkMax HotdogMotor;
 
   DigitalInput m_toplimitswitch = new DigitalInput(4);
   DigitalInput m_bottomlimitswitch = new DigitalInput(5);
@@ -49,9 +49,9 @@ public class IntakeSubsystem extends SubsystemBase{
   boolean isMovingOut;
 
   public IntakeSubsystem(){     
-    intakeMax = new SparkMax(Constants.IntakeConstants.FeederMotorID, MotorType.kBrushless);
+    intakeMax = new SparkMax(Constants.IntakeConstants.FeederMotorID, MotorType.kBrushed);
     //intakeMoverMax = new SparkMax(Constants.IntakeConstants.MoverMotorID, MotorType.kBrushless);
-    HotdogmotorID = new SparkMax(Constants.IntakeConstants.HotdogmotorID,MotorType.kBrushless);
+    HotdogMotor = new SparkMax(Constants.IntakeConstants.HotdogMotorID,MotorType.kBrushless);
     isIntakeOut = false;
     isMovingOut = false;
   }
@@ -76,7 +76,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
   public Command intakeOut(){
     return run(()->{
-                  HotdogmotorID.set(1);
+                  HotdogMotor.set(1);
 
       intakeMax.set(-intakeSpeed);
     });
@@ -84,7 +84,7 @@ public class IntakeSubsystem extends SubsystemBase{
 
   public Command intakeStop(){
     return run(()->{
-                  HotdogmotorID.set(0);
+                  HotdogMotor.set(0);
 
       intakeMax.set(0);
     });
@@ -159,13 +159,13 @@ public class IntakeSubsystem extends SubsystemBase{
         desiredSpeed = -desiredSpeed;
       }
       
-      HotdogmotorID.set(desiredSpeed);
+      HotdogMotor.set(desiredSpeed);
     });
   } 
 
   public Command stopHotDog(){
     return run(()->{
-      HotdogmotorID.set(0);
+      HotdogMotor.set(0);
     });
   } 
 }
