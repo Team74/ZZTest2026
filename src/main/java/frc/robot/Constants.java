@@ -23,7 +23,7 @@ public final class Constants
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
-  public static final double MAX_SPEED  = Units.feetToMeters(8);
+  public static final double MAX_SPEED  = Units.feetToMeters(13);
  // public static final double TURRET_TURN_MOTOR_ID = 1; //THESE ID NUMBERS ARE INCORRECT!!! FIX WHEN CAD GETS THEIR STUFF TOGETHER!!
   //public static final double TURRET_SHOOT_MOTOR_ID = 2; // WILL NEED FIXING  
 
@@ -48,7 +48,7 @@ public final class Constants
     public static final int HotdogMotorID = 31;
     public static final int MoverMotorID = 34;
     public static final int FeederMotorID = 33;
-    public static final double IntakeMoverSpeed = 0.5;
+    public static final double IntakeMoverSpeed = 0.3;
   }
 
   public static class OperatorConstants
@@ -65,7 +65,8 @@ public final class Constants
     public static final int TowerMotorID = 3;
     public static final int ShooterMotorID = 6;
     public static final int ShooterMotor2ID = 7;
-    public static int desiredRPS = -90;
+    public static int shooterDesiredRPS = 90;
+    public static int towerDesiredRPS = 90;
     public static double KS = 0.05;
     public static double KV = 0.12;
     public static double KP = 0.11;

@@ -6,6 +6,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -54,10 +55,11 @@ public class RobotContainer
   private final SwerveSubsystem drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/Kraken"));
   private final SendableChooser<Command> autoChooser;
 
-  private final Turret_Shoot shootSubsystem = new Turret_Shoot();
   private final Turret_Hood hoodSubsystem = new Turret_Hood();
   private final IntakeSubsystem intake = new IntakeSubsystem();
   private final IntakeFlipperSubsystem intake2 = new IntakeFlipperSubsystem();
+  private final Turret_Shoot shootSubsystem = new Turret_Shoot(intake);
+
  // private final LEDs led = new LEDs();
   private final ClimberSubsystem Climber = new ClimberSubsystem();
   
@@ -143,7 +145,7 @@ public class RobotContainer
       intake.setDefaultCommand(intake.intakeStop());
       intake.setDefaultCommand(intake.stopHotDog());
       Climber.setDefaultCommand(Climber.ClimbStop());
-      intake2.setDefaultCommand(intake2.Stop());
+      intake2.setDefaultCommand(intake2.MoveToDesiredState());
 
       testControls();
     } 
@@ -186,35 +188,46 @@ void LEDs() {
 
   void TurretSubsystem() {
     //shooter flywheels
-    operatorXbox.rightTrigger().and(operatorXbox.b().negate()).onTrue(shootSubsystem.shoot(false)).whileFalse(shootSubsystem.stopShooter());
-    // reverse
-    //operatorXbox.rightTrigger().and(operatorXbox.b()).onTrue(shootSubsystem.reverseShoot()).whileFalse(shootSubsystem.stopShooter());
+    //tower motor
+    //Hot dogrollers
+    operatorXbox.rightTrigger()
+      .onTrue(shootSubsystem.shoot(operatorXbox.b().getAsBoolean()))
+      .onFalse(shootSubsystem.stopShooter());
 
-    //moves hood 
-    operatorXbox.leftBumper().onTrue(hoodSubsystem.MoveHoodOut()).whileFalse(hoodSubsystem.StopHood());
-    // reverse
-    operatorXbox.rightBumper().onTrue(hoodSubsystem.MoveHoodIn()).whileFalse(hoodSubsystem.StopHood());
-    //TODO:DELETE AFTER OR CHANGE
-    //test elevator code
-    //operatorXbox.y().onTrue(shootSubsystem.testElevatorUp()).onFalse(shootSubsystem.testElevatorStop());
-    //operatorXbox.x().onTrue(shootSubsystem.testElevatorDown()).onFalse(shootSubsystem.testElevatorStop());
+    //Hood Motor
+    operatorXbox.leftBumper()
+      .onTrue(hoodSubsystem.MoveHood(operatorXbox.b().getAsBoolean()))
+      .onFalse(hoodSubsystem.StopHood());
   }
 
   void IntakeSubsystem() {
-    //flips intake in or out
-    operatorXbox.a().onTrue(intake.Swap());
-    intake.MoveIntake().repeatedly();
-    //spins intake flywheels 
-    operatorXbox.leftTrigger().and(operatorXbox.b().negate()).onTrue(intake.intakeIn()).whileFalse(intake.intakeStop());
-    //reverse
-    operatorXbox.leftTrigger().and(operatorXbox.b()).onTrue(intake.intakeOut()).whileFalse(intake.intakeStop());
+    //Intake Roller Motor
+    operatorXbox.leftTrigger()
+      .whileTrue(intake.moveIntake(operatorXbox.b().getAsBoolean()))
+      .whileFalse(intake.intakeStop());
+
+    //Intake Flipper Motor
+    //Debouce events faster than 0.2 seconds
+    operatorXbox.x()
+      .debounce(0.2)
+      .onTrue(intake2.SwapDesiredState())
+      .onFalse(intake2.MoveToDesiredState());
+
+    operatorXbox.a()
+      .onTrue(intake.moveHotDog(operatorXbox.b().getAsBoolean()))
+      .onFalse(intake.stopHotDog());
   }
   
   void ClimberSubsystem() {
     // up on the D-Pad goes up
-    operatorXbox.povUp().onTrue(Climber.ClimbUp()).whileFalse(Climber.ClimbStop());
+    operatorXbox.povUp()
+      .onTrue(Climber.ClimbUp())
+      .whileFalse(Climber.ClimbStop());
+
     // down on the D-Pad goes down
-    operatorXbox.povDown().onTrue(Climber.ClimbDown()).whileFalse(Climber.ClimbStop());
+    operatorXbox.povDown()
+      .onTrue(Climber.ClimbDown())
+      .whileFalse(Climber.ClimbStop());
   }
 
   void testControls() {
@@ -246,7 +259,7 @@ void LEDs() {
     //Intake Flipper Motor
     operatorXbox.x()
       .onTrue(intake2.SwapDesiredState())
-      .onFalse(intake2.Stop());
+      .onFalse(intake2.MoveToDesiredState());
 
     //Climber Motor
     operatorXbox.a()

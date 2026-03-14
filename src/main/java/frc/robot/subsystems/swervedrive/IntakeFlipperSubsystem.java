@@ -57,6 +57,7 @@ public class IntakeFlipperSubsystem extends SubsystemBase{
       else {
         currentDesiredState = eDesiredEndState.IN;
       }
+      System.out.println("swap");
     });
   }
 

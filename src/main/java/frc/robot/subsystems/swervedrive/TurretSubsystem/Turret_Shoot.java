@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.swervedrive.IntakeSubsystem;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -77,11 +78,15 @@ public class Turret_Shoot extends SubsystemBase {
 
   Follower thign = new Follower(6, MotorAlignmentValue.Opposed);
 
-  public Turret_Shoot() {
+  private final IntakeSubsystem intakeSubsystem;
+
+  public Turret_Shoot(IntakeSubsystem intakeSubsystem) {
     shooterMotor.getConfigurator().apply(toConfigure);
-    shooterMotor.setNeutralMode(NeutralModeValue.Brake);
+    shooterMotor.setNeutralMode(NeutralModeValue.Coast);
     shooterMotor2.getConfigurator().apply(toConfigure);
-    shooterMotor2.setNeutralMode(NeutralModeValue.Brake);
+    shooterMotor2.setNeutralMode(NeutralModeValue.Coast);
+
+    this.intakeSubsystem = intakeSubsystem;
     shooterMotor2.setControl(thign);
   }
 
@@ -90,7 +95,7 @@ public class Turret_Shoot extends SubsystemBase {
       currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
       System.out.println(currentRPS_Shooter);
 
-      var desiredSpeed = Constants.ShooterConstants.desiredRPS;
+      var desiredSpeed = Constants.ShooterConstants.shooterDesiredRPS;
       if(reverse){
         desiredSpeed = -desiredSpeed;
       }        
@@ -106,14 +111,15 @@ public class Turret_Shoot extends SubsystemBase {
 
   public Command testShoot(boolean reverse){
     return run(()->{
-      var desiredSpeed = Constants.ShooterConstants.desiredRPS;
+      var desiredSpeed = Constants.ShooterConstants.shooterDesiredRPS;
       if(reverse){
         desiredSpeed = -desiredSpeed;
       }
 
       var request = new VelocityVoltage(0).withSlot(0);
       shooterMotor.setControl(request.withVelocity(desiredSpeed).withFeedForward(0.5));
-
+      shooterMotor2.setControl(request.withVelocity(-desiredSpeed).withFeedForward(0.5));
+      System.out.println("shoot" + desiredSpeed);
     });
   } 
 
@@ -142,8 +148,8 @@ public class Turret_Shoot extends SubsystemBase {
       shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
       shooterMotor2.setControl(thign);
 
-      if (currentRPS_Shooter >= (Constants.ShooterConstants.desiredRPS * -0.75)) {
-        towerMotor.set(Constants.ShooterConstants.desiredRPS);
+      if (currentRPS_Shooter >= (Constants.ShooterConstants.shooterDesiredRPS * -0.75)) {
+        towerMotor.set(Constants.ShooterConstants.shooterDesiredRPS);
       }
      
     });
@@ -160,11 +166,11 @@ public class Turret_Shoot extends SubsystemBase {
 
   public Command testTower(boolean reverse){
     return run(()->{
-      var desiredSpeed = Constants.ShooterConstants.desiredRPS;
+      var desiredSpeed = Constants.ShooterConstants.shooterDesiredRPS;
       if(reverse){
         desiredSpeed = -desiredSpeed;
       }
-      towerMotor.set(-desiredSpeed);    
+      towerMotor.set(desiredSpeed);    
     });
   } 
 }
