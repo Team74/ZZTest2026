@@ -145,7 +145,7 @@ public class Turret_Shoot extends SubsystemBase {
       currentRPS_Shooter = shooterMotor.getVelocity().getValueAsDouble();
         
       var request = new VelocityVoltage(0).withSlot(0);
-      shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.desiredRPS).withFeedForward(0.5));
+      shooterMotor.setControl(request.withVelocity(Constants.ShooterConstants.shooterDesiredRPS).withFeedForward(0.5));
       shooterMotor2.setControl(thign);
 
       if (currentRPS_Shooter >= (Constants.ShooterConstants.shooterDesiredRPS * -0.75)) {
