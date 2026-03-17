@@ -25,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.IntakeFlipperSubsystem.eCurrentState;
+import frc.robot.subsystems.swervedrive.IntakeFlipperSubsystem.eDesiredEndState;
 import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Hood;
 import frc.robot.subsystems.swervedrive.TurretSubsystem.Turret_Shoot;
 import frc.robot.subsystems.swervedrive.LEDs;
@@ -116,6 +118,11 @@ public class RobotContainer
     DriverStation.silenceJoystickConnectionWarning(true);
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     NamedCommands.registerCommand("shoot", shootSubsystem.shoot(false));
+    // swaps state then moves until desired state is reached
+    NamedCommands.registerCommand("intake Swap", intake2.SwapDesiredState()
+                                                              .andThen(intake2.MoveToDesiredState()
+                                                              .until(() -> intake2.currentState == eCurrentState.OUT_STOPPED && intake2.currentDesiredState == eDesiredEndState.OUT 
+                                                                          |intake2.currentState == eCurrentState.IN_STOPPED && intake2.currentDesiredState == eDesiredEndState.IN)));
     autoChooser = AutoBuilder.buildAutoChooser();
 
     //Put the autoChooser on the SmartDashboard

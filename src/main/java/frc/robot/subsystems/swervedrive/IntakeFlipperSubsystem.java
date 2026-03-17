@@ -37,9 +37,9 @@ public class IntakeFlipperSubsystem extends SubsystemBase{
     MOVING_IN,
     MOVING_OUT
   }
-
-  eCurrentState currentState = eCurrentState.IN_STOPPED; 
-  eDesiredEndState currentDesiredState = eDesiredEndState.IN; 
+// needs to be public for named command "intake Down"
+ public eCurrentState currentState = eCurrentState.IN_STOPPED; 
+ public eDesiredEndState currentDesiredState = eDesiredEndState.IN; 
 
   SparkMax intakeMoverMax = new SparkMax(Constants.IntakeConstants.MoverMotorID, MotorType.kBrushless);
  
